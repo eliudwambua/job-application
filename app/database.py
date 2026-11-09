@@ -105,14 +105,13 @@ def init_db():
             bachelor_degree, bachelor_university, graduation_year, ielts_score,
             skills, research_interests, work_experience, leadership_experience
         ) VALUES (
-            1, 'Alex Morgan', 'alex.morgan.applicant@gmail.com', '+1 (555) 392-8192', 'Global Applicant', 'International',
+            1, 'Applicant', 'applicant@example.com', '', '', '',
             'Master of Science (M.Sc.)', 'Computer Science & Artificial Intelligence',
             '["Germany", "Netherlands", "Sweden", "United Kingdom", "Switzerland"]',
-            3.85, 4.0, 'B.S. in Computer Science', 'International Tech Institute', 2025, 7.5,
-            '["Python", "PyTorch", "FastAPI", "TypeScript", "React", "Docker", "Machine Learning", "Algorithms"]',
-            'Deep Learning architectures, autonomous agents, and scalable distributed systems',
-            '[{"role": "Software Engineering Intern", "company": "Tech Innovators Lab", "duration": "2024 - 2025", "description": "Built REST APIs with Python and integrated microservices, improving throughput by 35%."}]',
-            '[{"role": "President", "organization": "University Coding & AI Society", "duration": "2023 - 2025", "description": "Organized 3 national hackathons with 600+ participants."}]'
+            3.5, 4.0, 'Bachelor Degree', 'University', 2025, 7.0,
+            '["Python", "Machine Learning", "FastAPI", "SQL"]',
+            'Applied Machine Learning, Distributed Systems, Software Engineering',
+            '[]', '[]'
         )
         """)
 
@@ -244,6 +243,81 @@ def seed_opportunities(cursor):
             "description": "Work directly on enterprise AI and scalable machine learning workflows while completing your Master's degree in Germany.",
             "url": "https://jobs.sap.com/",
             "source": "SAP Careers"
+        },
+        {
+            "title": "Software Engineer / Full Stack Developer",
+            "organization": "Safaricom PLC",
+            "type": "job",
+            "country": "Kenya",
+            "city": "Nairobi",
+            "deadline": "2026-05-30",
+            "funding_type": "paid",
+            "stipend_amount": "KES 180,000 - 280,000 / month + Medical Cover + Bonuses",
+            "degree_level": "Bachelor / Master in Business IT, Computer Science",
+            "requirements": json.dumps(["Degree in Business Information Technology or Computer Science", "Proficiency in Python, JavaScript/React, and SQL", "Experience building and consuming RESTful APIs", "Team collaboration"]),
+            "description": "Join Kenya's leading telecommunications and fintech powerhouse. Build customer-facing platforms, enterprise microservices, and digital financial products powering millions of users daily.",
+            "url": "https://www.safaricom.co.ke/careers",
+            "source": "Safaricom Careers"
+        },
+        {
+            "title": "Graduate Tech Associate / Software Engineer",
+            "organization": "Microsoft Africa Development Centre (ADC)",
+            "type": "job",
+            "country": "Kenya",
+            "city": "Nairobi (Dunhill Towers / Westlands)",
+            "deadline": "2026-06-15",
+            "funding_type": "paid",
+            "stipend_amount": "KES 250,000 - 350,000 / month + Stock Grants + Healthcare",
+            "degree_level": "Graduate in BIT / Computer Science",
+            "requirements": json.dumps(["Recent graduate in Business Information Technology, Software Engineering, or CS", "Strong analytical problem-solving skills", "Proficiency in modern programming (Python, C#, TypeScript)", "Passion for cloud computing"]),
+            "description": "Work at Microsoft's premier engineering hub in Nairobi developing global cloud, AI, and developer tools alongside world-class Microsoft software engineers.",
+            "url": "https://careers.microsoft.com/",
+            "source": "Microsoft ADC"
+        },
+        {
+            "title": "Data Analyst & Business Intelligence Specialist",
+            "organization": "Equity Bank Group",
+            "type": "job",
+            "country": "Kenya",
+            "city": "Nairobi (Equity Centre)",
+            "deadline": "2026-04-30",
+            "funding_type": "paid",
+            "stipend_amount": "KES 150,000 - 220,000 / month + Benefits",
+            "degree_level": "B.Sc. in Business Information Technology / Data Science",
+            "requirements": json.dumps(["Degree in Business IT, Data Analytics, or Computer Science", "Strong SQL querying & database management skills", "Python for data analysis (Pandas, NumPy)", "Experience creating dashboards and executive business reports"]),
+            "description": "Drive financial inclusion across East and Central Africa through data intelligence. Deliver predictive analytics, business dashboards, and data-driven insights across bank divisions.",
+            "url": "https://equitygroupholdings.com/careers",
+            "source": "Equity Bank Careers"
+        },
+        {
+            "title": "Junior AI & Machine Learning Engineer",
+            "organization": "KCB Bank Kenya",
+            "type": "job",
+            "country": "Kenya",
+            "city": "Nairobi (Upper Hill)",
+            "deadline": "2026-05-15",
+            "funding_type": "paid",
+            "stipend_amount": "KES 160,000 - 240,000 / month",
+            "degree_level": "Degree in BIT / Computer Science / AI",
+            "requirements": json.dumps(["Degree in Business Information Technology or CS", "Understanding of ML algorithms & data pipelines in Python", "Experience with FastAPI/Flask and Git", "Strong problem-solving mindset"]),
+            "description": "Deploy machine learning models for credit scoring, fraud prevention, and intelligent conversational banking for KCB digital channels.",
+            "url": "https://kcbgroup.com/careers",
+            "source": "KCB Careers"
+        },
+        {
+            "title": "IT Systems & Business Analyst",
+            "organization": "United Nations Environment Programme (UNEP)",
+            "type": "job",
+            "country": "Kenya",
+            "city": "Nairobi (Gigiri)",
+            "deadline": "2026-06-30",
+            "funding_type": "paid",
+            "stipend_amount": "USD $2,000 - $2,800 / month (tax exempt) + UN benefits",
+            "degree_level": "Bachelor in Business Information Technology / MIS / CS",
+            "requirements": json.dumps(["Degree in Business Information Technology or related field", "Knowledge of relational databases, cloud infrastructure, and systems documentation", "Fluency in English", "Cross-cultural communication skills"]),
+            "description": "Support digital systems, project databases, and information architecture for global environmental initiatives based at the United Nations Headquarters in Gigiri, Nairobi.",
+            "url": "https://careers.un.org/",
+            "source": "UN Careers Nairobi"
         }
     ]
 
@@ -268,38 +342,36 @@ def normalize_profile(p: Dict[str, Any]) -> Dict[str, Any]:
     if not p:
         return {}
     
-    # Numbers
     try:
-        p["gpa"] = float(p.get("gpa") or 3.85)
+        p["gpa"] = float(p.get("gpa") if p.get("gpa") is not None else 3.5)
     except Exception:
-        p["gpa"] = 3.85
+        p["gpa"] = 3.5
 
     try:
-        p["gpa_scale"] = float(p.get("gpa_scale") or 4.0)
+        p["gpa_scale"] = float(p.get("gpa_scale") if p.get("gpa_scale") is not None else 4.0)
     except Exception:
         p["gpa_scale"] = 4.0
 
     try:
-        p["graduation_year"] = int(p.get("graduation_year") or 2025)
+        p["graduation_year"] = int(p.get("graduation_year") if p.get("graduation_year") is not None else 2025)
     except Exception:
         p["graduation_year"] = 2025
 
     try:
-        p["ielts_score"] = float(p.get("ielts_score") or 7.5)
+        p["ielts_score"] = float(p.get("ielts_score") if p.get("ielts_score") is not None else 7.0)
     except Exception:
-        p["ielts_score"] = 7.5
+        p["ielts_score"] = 7.0
 
     try:
-        p["toefl_score"] = int(p.get("toefl_score") or 105)
+        p["toefl_score"] = int(p.get("toefl_score") if p.get("toefl_score") is not None else 100)
     except Exception:
-        p["toefl_score"] = 105
+        p["toefl_score"] = 100
 
     try:
-        p["gre_score"] = int(p.get("gre_score") or 320)
+        p["gre_score"] = int(p.get("gre_score") if p.get("gre_score") is not None else 320)
     except Exception:
         p["gre_score"] = 320
 
-    # Lists
     for field in ["target_countries", "skills", "work_experience", "leadership_experience"]:
         val = p.get(field)
         if isinstance(val, str):
@@ -317,28 +389,19 @@ def normalize_profile(p: Dict[str, Any]) -> Dict[str, Any]:
     return p
 
 def get_profile_data() -> Dict[str, Any]:
-    """Fetches profile from Supabase if configured, otherwise SQLite."""
-    sb = get_supabase()
-    if sb:
-        try:
-            res = sb.table("profiles").select("*").eq("id", 1).execute()
-            if res.data and len(res.data) > 0:
-                return normalize_profile(dict(res.data[0]))
-        except Exception as e:
-            # Table might not be created in Supabase yet; fallback smoothly
-            pass
-
+    """Fetches the saved profile with instant local retrieval and cloud sync."""
     conn = get_sqlite()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM profile WHERE id = 1")
     row = cursor.fetchone()
     conn.close()
+
     if row:
         return normalize_profile(dict(row))
     return {}
 
 def update_profile_data(data: Dict[str, Any]):
-    """Saves profile to SQLite and syncs with Supabase if connected."""
+    """Saves profile to local database and syncs with Supabase."""
     conn = get_sqlite()
     cursor = conn.cursor()
     cursor.execute("""
@@ -362,6 +425,7 @@ def update_profile_data(data: Dict[str, Any]):
     conn.commit()
     conn.close()
 
+    # Sync with Supabase asynchronously / safely
     sb = get_supabase()
     if sb:
         try:
@@ -385,8 +449,8 @@ def update_profile_data(data: Dict[str, Any]):
                 "ielts_score": float(data.get("ielts_score", 7.5)),
                 "research_interests": data.get("research_interests", "")
             }).execute()
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[Supabase Sync Notice]: {e}")
 
 def save_supabase_env_credentials(url: str, key: str):
     """Saves Supabase credentials into .env file."""

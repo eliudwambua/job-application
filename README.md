@@ -1,145 +1,143 @@
 # 🎓 ScholarPilot EU
-### Automatic Master's Scholarship & Study-Job Application Copilot
+### Automatic European Master's Scholarship & Study-Job Application Copilot
 
-> **Zero repetitive forms.** Apply for European Master's degree programs, prestigious scholarships (Erasmus Mundus, DAAD, Chevening, Swedish Institute), and student employment (German *Werkstudent* and graduate internships) with tailored Statements of Purpose, optimized CVs, and smart browser auto-fill.
-
----
-
-## 🌟 Key Features
-
-1. **European Master's Intelligence Catalog:**
-   - Pre-loaded with top European scholarships: **Erasmus Mundus Joint Master Degrees (EMJMD)**, **DAAD Helmut-Schmidt & EPOS (Germany)**, **British Chevening (UK)**, **Holland NL Scholarship (Netherlands)**, **Swedish Institute SISGP (Sweden)**, and student employment (*Werkstudent* contracts at Siemens, SAP, ASML).
-   - **URL Auto-Extractor:** Paste *any* scholarship link, university portal page, or job announcement, and ScholarPilot automatically extracts the criteria, stipend, and deadlines.
-
-2. **AI-Powered Document Tailoring Studio:**
-   - **Statement of Purpose (SOP) / Motivation Letter:** Contextually generated matching your undergraduate background, GPA, and research interests to the specific host university and country.
-   - **ATS-Optimized Academic CV:** European standard format emphasizing relevant technical coursework, laboratory achievements, and impact metrics.
-   - **Scholarship Essay Answers:** Pre-drafted STAR-method answers for leadership prompts, "Why this program?", and long-term societal contribution.
-
-3. **Smart Assisted Autofill Engine (Human-in-the-Loop):**
-   - **Playwright Headed Browser:** Launches Chromium directly to the application portal, detects inputs, pre-fills your personal, academic, and document fields, and floats an in-page control bar so you can review before submitting safely.
-   - **Universal 1-Click Bookmarklet:** Drag the bookmarklet into your everyday browser (Chrome, Edge, Firefox, Brave) to autofill application forms on any website in one click.
-
-4. **Cloud Database (Supabase PostgreSQL):**
-   - Built to connect directly with **Supabase** cloud database, with an automatic local SQLite fallback so everything works right out of the box.
+> **Zero repetitive forms.** Apply for prestigious European Master's programs (**Erasmus Mundus**, **DAAD Germany**, **British Chevening**, **Swedish Institute**, **Holland Scholarship**) and student employment (German **Werkstudent** contracts & graduate internships) with tailored Statements of Purpose, European standard CVs, and smart browser auto-fill.
 
 ---
 
-## 🚀 60-Second Quick Start
+## 🧭 Navigation & System Layout
 
-### 1. Launch the Web Application
-Open your terminal in the project directory and run:
+ScholarPilot features dedicated pages to make finding and applying effortless:
+
+| Tab / Section | URL | Purpose & What You'll Find |
+| :--- | :--- | :--- |
+| **🏠 Dashboard** | `http://127.0.0.1:8000/` | 3-step action wizard, quick stats, active pipeline preview, and upcoming deadlines. |
+| **🎓 Scholarships** | `http://127.0.0.1:8000/scholarships` | **Dedicated scholarships directory**: Fully funded European Master's degrees, Erasmus Mundus consortia, DAAD grants, stipends, and deadlines. |
+| **💼 Jobs & Internships** | `http://127.0.0.1:8000/jobs` | **Dedicated student employment directory**: German *Werkstudent* positions (up to 20 hrs/week at €16–€25/hr at Siemens, SAP, ASML), and graduate internships. |
+| **📋 Tracker** | `http://127.0.0.1:8000/applications` | Visual Kanban board tracking every submission: *Bookmarked* ➔ *Tailoring* ➔ *Ready to Apply* ➔ *Submitted* ➔ *Interview* ➔ *Awarded*! |
+| **👤 My Profile (Vault)** | `http://127.0.0.1:8000/profile` | Upload your CV (PDF) to auto-extract details, manage academic metrics (GPA, IELTS/TOEFL), target field, and career history. |
+| **⚡ Copilot Studio** | `http://127.0.0.1:8000/copilot/{id}` | AI Tailoring workspace for any program: live editable Statement of Purpose (SOP), ATS-optimized academic CV, scholarship essays, and auto-fill launcher. |
+
+---
+
+## 🚀 How to Run the Application
+
+### Option A: 1-Click Launch (Recommended for Windows)
+Simply double-click the **`start.bat`** file in this folder:
+```
+job application/start.bat
+```
+This automatically starts the server and opens your web browser to:
+👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+
+---
+
+### Option B: Terminal Command
+Open PowerShell or Command Prompt in the project folder and run:
 
 ```powershell
 .\.venv\Scripts\python.exe run.py
 ```
 
-### 2. Open Your Browser
-Go to:
+Then open your browser and navigate to:
 👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
-*(Interactive API documentation is also available at `http://127.0.0.1:8000/docs`)*
+*(Interactive API docs are always available at `http://127.0.0.1:8000/docs`)*
 
 ---
 
-## 🗄️ Supabase Cloud Database Setup
-
-ScholarPilot is designed to store your applicant profile, applications pipeline, and documents in your free **Supabase** PostgreSQL database.
-
-### Step 1: Create a Free Project
-1. Go to [supabase.com](https://supabase.com) and create a free account.
-2. Click **New Project** and name it (e.g. `scholarpilot-db`).
-
-### Step 2: Run the Schema Script
-1. In your Supabase project dashboard, navigate to the **SQL Editor** tab on the left.
-2. Open the file `supabase_schema.sql` from this repository.
-3. Paste its contents into the SQL Editor and click **Run**.
-4. This creates the `profiles`, `opportunities`, `applications`, and `tailored_docs` tables with initial seed data.
-
-### Step 3: Connect Credentials in 1 Click
-You can connect Supabase in either of two ways:
-
-- **Via the Web UI (Easiest):**
-  Click the **"Supabase Setup"** pill in the top navigation bar of ScholarPilot, paste your **Project URL** and **API Key**, and click **Save & Connect**.
-- **Via the `.env` file:**
-  Edit the `.env` file in the root folder:
-  ```env
-  SUPABASE_URL=https://your-project-id.supabase.co
-  SUPABASE_KEY=your-anon-or-service-role-key
-  ```
-
----
-
-## 💡 How to Use the Application
+## 📖 Step-by-Step User Workflow
 
 ```
-   ┌──────────────────┐       ┌────────────────────────┐       ┌──────────────────────┐
-   │  1. Profile Vault │ ────> │ 2. Choose Opportunity  │ ────> │ 3. Tailor & Autofill │
-   │  (Upload CV PDF) │       │ (Erasmus / DAAD / Job) │       │ (1-Click Playwright) │
-   └──────────────────┘       └────────────────────────┘       └──────────────────────┘
+   ┌───────────────────────┐       ┌────────────────────────┐       ┌──────────────────────┐
+   │  1. Profile Vault     │ ────> │ 2. Pick Program / URL  │ ────> │ 3. Tailor & Autofill │
+   │  (Upload Resume PDF)  │       │ (Scholarship or Job)   │       │ (Playwright Copilot) │
+   └───────────────────────┘       └────────────────────────┘       └──────────────────────┘
 ```
 
-1. **Step 1: Set Up Your Profile (Vault)**
-   - Click **My Profile** in the top navigation bar.
-   - Click **"Upload CV (PDF)"** — ScholarPilot will automatically parse your text, extract your email, phone, GPA, graduation year, social links, and technical competencies.
-   - Fine-tune your target degree (e.g., M.Sc. in Computer Science) and target European destinations.
+### Step 1: Set Up Your Profile (Takes 1 Minute)
+1. In the top navigation bar, click **My Profile** (shows your name and GPA).
+2. Click **"Upload CV (PDF)"** — ScholarPilot uses PyPDF to automatically extract your full name, email, phone number, LinkedIn, GitHub, GPA, graduation year, and technical skills.
+3. Verify or edit your details (GPA scale, target degree, target European countries) and click **"Save & Update Master Profile"**.
 
-2. **Step 2: Browse or Add an Opportunity**
-   - Click **Scholarships & Jobs** to explore fully-funded European programs.
-   - Each card displays your **Match Score (%)**, funding package, and deadline.
-   - You can also paste any custom URL into **"Paste Any Portal Link"** to auto-extract details.
+### Step 2: Browse Scholarships vs. Jobs
+- **Looking for funded Master's studies?** Click **"Scholarships"** in the top navigation. Explore programs like Erasmus Mundus EMAI, DAAD EPOS, or British Chevening. Every card shows your calculated **% Fit** based on your GPA and field.
+- **Looking for student employment abroad?** Click **"Jobs & Internships"** in the top navigation. Explore working student contracts in Germany (up to 20 hrs/week) that allow you to earn €1,400–€1,800/month while studying.
+- **Found a link elsewhere?** Click **"Paste Any Portal Link"** on the Dashboard. ScholarPilot will scrape the webpage, extract the criteria, and add it for you.
 
-3. **Step 3: AI Copilot Tailoring Studio**
-   - Click **"AI Copilot & Tailor"** on any opportunity.
-   - Review your customized Statement of Purpose, tailored CV, and scholarship essay answers.
-   - You can edit in real-time, copy to clipboard, or download as a text file.
+### Step 3: Use the AI Copilot Tailoring Studio
+Click **"AI Copilot & Tailor"** on any scholarship or job:
+1. **Statement of Purpose (SOP):** Generates a comprehensive, persuasive motivation letter explicitly referencing your background, your GPA, and why you are applying to that specific consortium or university.
+2. **ATS-Optimized Academic CV:** Generates a structured European academic resume emphasizing relevant coursework and technical impact.
+3. **Scholarship Essays:** Provides pre-drafted STAR-method answers for leadership questions, career vision, and overcoming financial barriers.
+4. **PDF / Print Button:** Click **"PDF / Print"** on any document to open a publication-quality letterhead formatted for A4 printing or saving directly to PDF!
+5. **🔄 Re-tailor with My Profile:** If you edit your profile details at any point, click this button to instantly re-synthesize your documents with your latest information!
 
-4. **Step 4: Smart Assisted Autofill**
-   - In the Copilot Studio, switch to the **Smart Form Copilot** tab.
-   - Click **"Launch Browser Copilot"** to open Playwright Chromium. It automatically pre-fills the portal's form fields.
-   - Or drag the **"⚡ ScholarPilot Fill"** bookmarklet to your bookmarks bar to autofill inside your personal Chrome/Edge browser.
+### Step 4: Smart Assisted Auto-Fill & Submission
+Under the **Smart Form Copilot** tab in the Studio, you have two flexible methods:
 
-5. **Step 5: Pipeline Tracker**
-   - Track your submissions in the visual Kanban board across stages: *Bookmarked* ➔ *Tailoring* ➔ *Ready to Apply* ➔ *Submitted* ➔ *Interview* ➔ *Offer Awarded*!
+- **Method 1: Headed Browser Copilot (Playwright)**
+  Click **"Launch Browser Copilot"**. This spawns an independent browser window navigating to the portal, detects form inputs (name, email, phone, GPA, university, degree, textareas), pre-fills them, and displays a floating control bar on the page so you can review every answer before submitting.
+- **Method 2: Universal 1-Click Bookmarklet (Works in Chrome, Edge, Brave, Firefox)**
+  Drag the yellow **"⚡ ScholarPilot Fill"** button up to your browser's Bookmarks bar. Whenever you are on an application portal page in your personal browser, click that bookmark to auto-populate the form in 1 second!
 
 ---
 
-## 🛠️ Project Structure
+## 🗄️ Supabase Cloud Database Integration
+
+ScholarPilot is configured to sync your applicant profile, applications, and documents directly to **Supabase**.
+
+### 1-Minute Supabase Setup:
+1. Go to [supabase.com](https://supabase.com) and create a free project.
+2. Open the **SQL Editor** tab in your Supabase project dashboard.
+3. Open the file [`supabase_schema.sql`](file:///d:/desktop/job%20application/supabase_schema.sql) in this directory, copy its entire contents, paste them into the Supabase SQL Editor, and click **Run**.
+4. In ScholarPilot, click the **"Supabase Setup"** button in the top navigation bar, paste your **Project URL** and **API Key**, and click **Save & Connect**.
+5. The status badge in the header will turn green: **"Supabase Active"**.
+
+---
+
+## 🛡️ Anti-Bot & Ban-Free Guarantee
+
+Most European university portals and job boards (e.g. Siemens, SAP, university application systems) use anti-bot systems (Cloudflare, CAPTCHA, SSO). 
+
+ScholarPilot follows a **Smart Assisted Copilot** model:
+- The bot handles the repetitive, tedious typing (names, addresses, education history, transcript details, essay answers).
+- **You** retain 100% human-in-the-loop oversight to review the filled fields and click the final submit button.
+- Zero risk of automated account bans or bot rejections.
+
+---
+
+## 📁 Project Architecture
 
 ```
 job application/
 ├── app/
-│   ├── data/                 # Local SQLite fallback storage
+│   ├── data/                 # Local SQLite persistent storage
 │   ├── services/
 │   │   ├── ai_tailor.py          # SOP, CV & essay generation algorithms
+│   │   ├── browser_runner.py     # Independent Windows browser launcher
 │   │   ├── pdf_parser.py         # PyPDF extractor for resumes
 │   │   ├── playwright_copilot.py # Headed browser & bookmarklet autofill
-│   │   └── scholarship_scraper.py# Opportunity link auto-extractor
+│   │   └── scholarship_scraper.py# Portal link auto-extractor
 │   ├── templates/            # Clean, minimalist UI templates
-│   │   ├── base.html             # Main layout, nav, Supabase modal
-│   │   ├── dashboard.html        # 3-step action wizard & overview
-│   │   ├── opportunities.html    # Scholarships & jobs directory
+│   │   ├── base.html             # Top navigation & Supabase modal
+│   │   ├── dashboard.html        # 3-step action wizard
+│   │   ├── scholarships.html     # Dedicated European Master's Scholarships directory
+│   │   ├── jobs.html             # Dedicated Student Jobs & Internships directory
 │   │   ├── copilot_studio.html   # Tailoring studio & Playwright launcher
+│   │   ├── print_doc.html        # Publication-grade print & PDF layout
 │   │   ├── applications.html     # Kanban pipeline tracker
 │   │   └── profile.html          # Profile & CV upload vault
-│   ├── database.py           # Database abstraction (Supabase + SQLite)
-│   ├── main.py               # FastAPI web server and routes
+│   ├── database.py           # Robust database adapter (Supabase + Local SQLite)
+│   ├── main.py               # FastAPI web server and endpoints
 │   └── supabase_client.py    # Supabase Python SDK client
-├── supabase_schema.sql       # Ready-to-run PostgreSQL schema for Supabase
-├── run.py                    # One-command application launcher
-├── .env.example              # Sample environment configuration
-└── README.md                 # Documentation
+├── supabase_schema.sql       # PostgreSQL schema script for Supabase
+├── start.bat                 # 1-Click desktop launcher for Windows
+├── run.py                    # Terminal server runner
+├── .env                      # Supabase credentials configuration
+└── README.md                 # Complete documentation
 ```
 
 ---
 
-## 🔒 Ban-Free & Compliant Guarantee
-
-Most scholarship portals and job sites employ anti-bot measures (CAPTCHA, Cloudflare, single sign-on). ScholarPilot uses a **Smart Assisted Copilot** model:
-- The bot assists by filling repetitive fields, but **you** maintain control to inspect every answer and click the final submit button.
-- Zero risk of automated rejection, account suspension, or captcha blocking.
-
----
-
-*Built with Python 3.13, FastAPI, Supabase, Playwright, and Tailwind CSS.*
-
+*Built for ambitious scholars targeting European Master's degrees and global careers.*

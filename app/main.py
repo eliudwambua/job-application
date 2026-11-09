@@ -6,7 +6,6 @@ from fastapi import FastAPI, Request, Form, UploadFile, File, BackgroundTasks, H
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 
 from app.database import init_db, get_db, get_profile_data, update_profile_data, save_supabase_env_credentials
 from app.supabase_client import is_supabase_configured, get_supabase_url
@@ -17,7 +16,6 @@ from app.services.scholarship_scraper import extract_opportunity_from_url
 
 app = FastAPI(title="ScholarPilot EU - Master's & Job Application Copilot", version="1.0.0")
 
-# Setup paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -37,7 +35,6 @@ async def dashboard_page(request: Request):
     conn = get_db()
     cursor = conn.cursor()
 
-    # Metrics
     cursor.execute("SELECT COUNT(*) FROM opportunities")
     total_opps = cursor.fetchone()[0]
 
@@ -50,7 +47,6 @@ async def dashboard_page(request: Request):
     cursor.execute("SELECT COUNT(*) FROM applications WHERE status = 'applied'")
     total_submitted = cursor.fetchone()[0]
 
-    # Upcoming opportunities
     cursor.execute("SELECT * FROM opportunities ORDER BY id DESC LIMIT 6")
     opps = [dict(r) for r in cursor.fetchall()]
     for o in opps:
@@ -61,7 +57,6 @@ async def dashboard_page(request: Request):
         match = calculate_match_score(profile, o)
         o["match_score"] = match["score"]
 
-    # Active applications
     cursor.execute("""
     SELECT a.*, o.title as opp_title, o.organization as opp_org, o.country as opp_country, o.deadline as opp_deadline, o.type as opp_type
     FROM applications a
@@ -71,19 +66,156 @@ async def dashboard_page(request: Request):
     recent_apps = [dict(r) for r in cursor.fetchall()]
     conn.close()
 
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
-        "profile": profile,
-        "total_opps": total_opps,
-        "total_apps": total_apps,
-        "total_docs": total_docs,
-        "total_submitted": total_submitted,
-        "opportunities": opps,
-        "recent_applications": recent_apps,
-        "supabase_connected": is_supabase_configured(),
-        "supabase_url": get_supabase_url(),
-        "active_tab": "dashboard"
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="dashboard.html",
+        context={
+            "profile": profile,
+            "total_opps": total_opps,
+            "total_apps": total_apps,
+            "total_docs": total_docs,
+            "total_submitted": total_submitted,
+            "opportunities": opps,
+            "recent_applications": recent_apps,
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "dashboard"
+        }
+    )
+
+@app.get("/scholarships", response_class=HTMLResponse)
+async def scholarships_page(request: Request, country: Optional[str] = None, q: Optional[str] = None):
+    profile = get_profile_data()
+    conn = get_db()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM opportunities WHERE type = 'scholarship'"
+    params = []
+    if country and country != "all":
+        query += " AND country LIKE ?"
+        params.append(f"%{country}%")
+    if q:
+        query += " AND (title LIKE ? OR organization LIKE ? OR description LIKE ?)"
+        params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+
+    query += " ORDER BY id DESC"
+    cursor.execute(query, params)
+    opps = [dict(r) for r in cursor.fetchall()]
+
+    for o in opps:
+        try:
+            o["requirements"] = json.loads(o["requirements"])
+        except Exception:
+            o["requirements"] = []
+        match = calculate_match_score(profile, o)
+        o["match_score"] = match["score"]
+        o["match_reasons"] = match["reasons"]
+
+    cursor.execute("SELECT DISTINCT country FROM opportunities WHERE type = 'scholarship'")
+    countries = [r[0] for r in cursor.fetchall() if r[0]]
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="scholarships.html",
+        context={
+            "profile": profile,
+            "opportunities": opps,
+            "countries": countries,
+            "current_country": country or "all",
+            "search_query": q or "",
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "scholarships"
+        }
+    )
+
+@app.get("/kenya-jobs", response_class=HTMLResponse)
+async def kenya_jobs_page(request: Request, q: Optional[str] = None):
+    profile = get_profile_data()
+    conn = get_db()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM opportunities WHERE country = 'Kenya'"
+    params = []
+    if q:
+        query += " AND (title LIKE ? OR organization LIKE ? OR description LIKE ?)"
+        params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+
+    query += " ORDER BY id DESC"
+    cursor.execute(query, params)
+    opps = [dict(r) for r in cursor.fetchall()]
+
+    for o in opps:
+        try:
+            o["requirements"] = json.loads(o["requirements"])
+        except Exception:
+            o["requirements"] = []
+        match = calculate_match_score(profile, o)
+        o["match_score"] = match["score"]
+        o["match_reasons"] = match["reasons"]
+
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="kenya_jobs.html",
+        context={
+            "profile": profile,
+            "opportunities": opps,
+            "search_query": q or "",
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "kenya_jobs"
+        }
+    )
+
+@app.get("/jobs", response_class=HTMLResponse)
+async def jobs_page(request: Request, country: Optional[str] = None, q: Optional[str] = None):
+    profile = get_profile_data()
+    conn = get_db()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM opportunities WHERE type IN ('job', 'internship')"
+    params = []
+    if country and country != "all":
+        query += " AND country LIKE ?"
+        params.append(f"%{country}%")
+    if q:
+        query += " AND (title LIKE ? OR organization LIKE ? OR description LIKE ?)"
+        params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+
+    query += " ORDER BY id DESC"
+    cursor.execute(query, params)
+    opps = [dict(r) for r in cursor.fetchall()]
+
+    for o in opps:
+        try:
+            o["requirements"] = json.loads(o["requirements"])
+        except Exception:
+            o["requirements"] = []
+        match = calculate_match_score(profile, o)
+        o["match_score"] = match["score"]
+        o["match_reasons"] = match["reasons"]
+
+    cursor.execute("SELECT DISTINCT country FROM opportunities WHERE type IN ('job', 'internship')")
+    countries = [r[0] for r in cursor.fetchall() if r[0]]
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="jobs.html",
+        context={
+            "profile": profile,
+            "opportunities": opps,
+            "countries": countries,
+            "current_country": country or "all",
+            "search_query": q or "",
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "jobs"
+        }
+    )
 
 @app.get("/opportunities", response_class=HTMLResponse)
 async def opportunities_page(request: Request, type: Optional[str] = None, country: Optional[str] = None, q: Optional[str] = None):
@@ -121,18 +253,21 @@ async def opportunities_page(request: Request, type: Optional[str] = None, count
     countries = [r[0] for r in cursor.fetchall() if r[0]]
     conn.close()
 
-    return templates.TemplateResponse("opportunities.html", {
-        "request": request,
-        "profile": profile,
-        "opportunities": opps,
-        "countries": countries,
-        "current_type": type or "all",
-        "current_country": country or "all",
-        "search_query": q or "",
-        "supabase_connected": is_supabase_configured(),
-        "supabase_url": get_supabase_url(),
-        "active_tab": "opportunities"
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="opportunities.html",
+        context={
+            "profile": profile,
+            "opportunities": opps,
+            "countries": countries,
+            "current_type": type or "all",
+            "current_country": country or "all",
+            "search_query": q or "",
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "opportunities"
+        }
+    )
 
 @app.get("/copilot/{opp_id}", response_class=HTMLResponse)
 async def copilot_studio_page(request: Request, opp_id: int):
@@ -151,7 +286,6 @@ async def copilot_studio_page(request: Request, opp_id: int):
     except Exception:
         opp["requirements"] = []
 
-    # Check or create application record
     cursor.execute("SELECT * FROM applications WHERE opportunity_id = ?", (opp_id,))
     app_record = cursor.fetchone()
     if not app_record:
@@ -162,22 +296,29 @@ async def copilot_studio_page(request: Request, opp_id: int):
     
     app_data = dict(app_record)
 
-    # Check existing tailored docs
     cursor.execute("SELECT * FROM tailored_docs WHERE application_id = ?", (app_data["id"],))
     docs_rows = cursor.fetchall()
     docs = {d["doc_type"]: dict(d) for d in docs_rows}
 
-    # Generate if not exists
+    user_name = profile.get("full_name", "")
+    force_regen = request.query_params.get("regenerate") == "true"
+
     sop_content = docs.get("sop", {}).get("content")
-    if not sop_content:
+    if not sop_content or force_regen or (user_name and user_name != "Alex Morgan" and "Alex Morgan" in (sop_content or "")):
         sop_content = generate_sop(profile, opp)
-        cursor.execute("INSERT INTO tailored_docs (application_id, doc_type, title, content) VALUES (?, 'sop', 'Statement of Purpose / Motivation Letter', ?)", (app_data["id"], sop_content))
+        if "sop" in docs:
+            cursor.execute("UPDATE tailored_docs SET content = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?", (sop_content, docs["sop"]["id"]))
+        else:
+            cursor.execute("INSERT INTO tailored_docs (application_id, doc_type, title, content) VALUES (?, 'sop', 'Statement of Purpose / Motivation Letter', ?)", (app_data["id"], sop_content))
         conn.commit()
 
     resume_content = docs.get("resume", {}).get("content")
-    if not resume_content:
+    if not resume_content or force_regen or (user_name and user_name != "Alex Morgan" and "Alex Morgan" in (resume_content or "")):
         resume_content = generate_tailored_resume(profile, opp)
-        cursor.execute("INSERT INTO tailored_docs (application_id, doc_type, title, content) VALUES (?, 'resume', 'ATS-Optimized Academic CV', ?)", (app_data["id"], resume_content))
+        if "resume" in docs:
+            cursor.execute("UPDATE tailored_docs SET content = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?", (resume_content, docs["resume"]["id"]))
+        else:
+            cursor.execute("INSERT INTO tailored_docs (application_id, doc_type, title, content) VALUES (?, 'resume', 'ATS-Optimized Academic CV', ?)", (app_data["id"], resume_content))
         conn.commit()
 
     match_analysis = calculate_match_score(profile, opp)
@@ -185,20 +326,23 @@ async def copilot_studio_page(request: Request, opp_id: int):
     bookmarklet = generate_bookmarklet_code(profile, sop_content)
     conn.close()
 
-    return templates.TemplateResponse("copilot_studio.html", {
-        "request": request,
-        "profile": profile,
-        "opp": opp,
-        "application": app_data,
-        "sop_content": sop_content,
-        "resume_content": resume_content,
-        "match_analysis": match_analysis,
-        "essay_answers": essay_answers,
-        "bookmarklet": bookmarklet,
-        "supabase_connected": is_supabase_configured(),
-        "supabase_url": get_supabase_url(),
-        "active_tab": "opportunities"
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="copilot_studio.html",
+        context={
+            "profile": profile,
+            "opp": opp,
+            "application": app_data,
+            "sop_content": sop_content,
+            "resume_content": resume_content,
+            "match_analysis": match_analysis,
+            "essay_answers": essay_answers,
+            "bookmarklet": bookmarklet,
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "opportunities"
+        }
+    )
 
 @app.get("/copilot/{opp_id}/print-doc", response_class=HTMLResponse)
 async def print_doc_page(request: Request, opp_id: int, type: str = "sop"):
@@ -221,12 +365,15 @@ async def print_doc_page(request: Request, opp_id: int, type: str = "sop"):
 
     conn.close()
 
-    return templates.TemplateResponse("print_doc.html", {
-        "request": request,
-        "profile": profile,
-        "title": title,
-        "content": content
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="print_doc.html",
+        context={
+            "profile": profile,
+            "title": title,
+            "content": content
+        }
+    )
 
 @app.get("/applications", response_class=HTMLResponse)
 async def applications_tracker_page(request: Request):
@@ -260,26 +407,32 @@ async def applications_tracker_page(request: Request):
 
     conn.close()
 
-    return templates.TemplateResponse("applications.html", {
-        "request": request,
-        "profile": profile,
-        "columns": columns,
-        "total_tracked": len(apps),
-        "supabase_connected": is_supabase_configured(),
-        "supabase_url": get_supabase_url(),
-        "active_tab": "applications"
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="applications.html",
+        context={
+            "profile": profile,
+            "columns": columns,
+            "total_tracked": len(apps),
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "applications"
+        }
+    )
 
 @app.get("/profile", response_class=HTMLResponse)
 async def profile_page(request: Request):
     profile = get_profile_data()
-    return templates.TemplateResponse("profile.html", {
-        "request": request,
-        "profile": profile,
-        "supabase_connected": is_supabase_configured(),
-        "supabase_url": get_supabase_url(),
-        "active_tab": "profile"
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="profile.html",
+        context={
+            "profile": profile,
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "profile"
+        }
+    )
 
 # ----------------- API Endpoints -----------------
 
@@ -360,7 +513,6 @@ async def save_profile(
 
 @app.post("/api/profile/upload-cv")
 async def upload_cv_pdf(file: UploadFile = File(...)):
-    """Uploads CV PDF, parses text with pypdf and extracts profile attributes."""
     contents = await file.read()
     extracted = parse_pdf_resume(contents)
 
@@ -393,7 +545,6 @@ async def upload_cv_pdf(file: UploadFile = File(...)):
 
 @app.post("/api/settings/supabase")
 async def save_supabase_settings(payload: dict):
-    """Saves Supabase URL and Key directly from the UI Settings modal."""
     url = payload.get("url", "").strip()
     key = payload.get("key", "").strip()
 
@@ -447,19 +598,34 @@ async def create_opportunity(
     return RedirectResponse(url=f"/copilot/{opp_id}", status_code=303)
 
 @app.post("/api/copilot/launch-browser")
-async def launch_browser_copilot(background_tasks: BackgroundTasks, payload: dict):
-    target_url = payload.get("target_url")
+async def launch_browser_copilot(payload: dict):
+    import subprocess
+    import sys
+    import webbrowser
+
+    target_url = (payload.get("target_url") or "").strip()
     tailored_doc = payload.get("tailored_doc", "")
 
     profile = get_profile_data()
-    if not target_url:
-        raise HTTPException(status_code=400, detail="Target application portal URL is required")
+    if not target_url or not target_url.startswith("http"):
+        target_url = "https://www.google.com"
 
-    background_tasks.add_task(launch_assisted_apply_session, target_url, profile, tailored_doc)
+    runner_script = os.path.join(os.path.dirname(__file__), "services", "browser_runner.py")
+    profile_json = json.dumps(profile)
+
+    try:
+        # Spawn detached process that pops up on Windows desktop
+        subprocess.Popen(
+            [sys.executable, runner_script, target_url, profile_json, tailored_doc],
+            creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0
+        )
+    except Exception as e:
+        # Reliable fallback: open portal in default browser
+        webbrowser.open(target_url)
 
     return JSONResponse({
         "status": "launched",
-        "message": "Playwright Smart Browser launched! Check the newly opened Chromium window."
+        "message": "Browser Copilot launched! Check your Windows taskbar for the window."
     })
 
 @app.post("/api/applications/update-status")

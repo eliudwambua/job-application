@@ -22,8 +22,11 @@
 
             <!-- Quick Action Buttons -->
             <div class="flex flex-wrap items-center gap-2.5">
-                <a href="/opportunities" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
-                    <i data-lucide="compass" class="w-4 h-4"></i> Browse Scholarships
+                <a href="/scholarships" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i> Scholarships
+                </a>
+                <a href="/jobs" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i> Jobs & Internships
                 </a>
                 <button onclick="document.getElementById('quick-url-modal').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 font-bold text-xs border border-indigo-500/40 transition-all flex items-center gap-2">
                     <i data-lucide="link" class="w-4 h-4"></i> Paste Any Portal Link
@@ -44,13 +47,17 @@
                 </div>
             </a>
 
-            <a href="/opportunities" class="bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 rounded-xl p-3 flex items-start gap-3 transition-colors group">
-                <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">2</div>
+            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs flex-shrink-0">2</div>
                 <div>
-                    <div class="text-xs font-bold text-white">Pick Scholarship or Job</div>
-                    <div class="text-[11px] text-slate-400">Select Erasmus, DAAD, UK or paste any URL.</div>
+                    <div class="text-xs font-bold text-white">Pick Program</div>
+                    <div class="text-[11px] text-slate-400 flex gap-2 mt-0.5">
+                        <a href="/scholarships" class="text-purple-400 hover:underline">🎓 Scholarships</a>
+                        <span class="text-slate-600">•</span>
+                        <a href="/jobs" class="text-emerald-400 hover:underline">💼 Jobs</a>
+                    </div>
                 </div>
-            </a>
+            </div>
 
             <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 flex items-start gap-3">
                 <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0">3</div>
