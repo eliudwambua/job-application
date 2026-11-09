@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ScholarPilot EU - Automatic Master's & Job Application Copilot{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="/" class="flex items-center gap-2.5 text-white font-bold text-lg tracking-tight">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent font-extrabold text-lg sm:text-xl">ScholarPilot</span>
+                        <span class="text-[11px] ml-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">EU</span>
+                    </div>
+                </a>
+
+                <!-- Main Nav Tabs -->
+                <nav class="hidden md:flex items-center gap-1 ml-6">
+                    <a href="/" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'dashboard' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard
+                    </a>
+                    <a href="/opportunities" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'opportunities' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                        <i data-lucide="compass" class="w-3.5 h-3.5"></i> Scholarships & Jobs
+                    </a>
+                    <a href="/applications" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'applications' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                        <i data-lucide="kanban-square" class="w-3.5 h-3.5"></i> Tracker
+                    </a>
+                    <a href="/profile" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'profile' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                        <i data-lucide="user" class="w-3.5 h-3.5"></i> My Profile
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Database Status & Quick Action -->
+            <div class="flex items-center gap-2.5">
+                <!-- Supabase Status Pill (Click to configure) -->
+                <button onclick="document.getElementById('supabase-modal').classList.remove('hidden')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if supabase_connected %}bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20{% else %}bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-500{% endif %}" title="Click to view or connect Supabase">
+                    <span class="w-2 h-2 rounded-full {% if supabase_connected %}bg-emerald-400 animate-pulse{% else %}bg-amber-400{% endif %}"></span>
+                    <span class="hidden sm:inline">{% if supabase_connected %}Supabase Active{% else %}Supabase Setup{% endif %}</span>
+                    <i data-lucide="settings" class="w-3 h-3 text-slate-400"></i>
+                </button>
+
+                <a href="/opportunities" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-600/25 transition-all">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Apply to Master's</span>
+                    <span class="sm:hidden">Apply</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Supabase Configuration Modal -->
+    <div id="supabase-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                        <i data-lucide="database" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Supabase Cloud Database</h3>
+                </div>
+                <button onclick="document.getElementById('supabase-modal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Connect your free Supabase project to store your profile, scholarships, and applications in the cloud.
+            </p>
+
+            <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700 text-xs space-y-1.5">
+                <div class="font-bold text-emerald-400 flex items-center gap-1">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i> 1-Step Database Setup:
+                </div>
+                <div class="text-slate-300">
+                    Open your Supabase project -> <b>SQL Editor</b> -> paste the contents of <code>supabase_schema.sql</code> and click <b>Run</b>.
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-1">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Supabase Project URL</label>
+                    <input id="sb-url-input" type="url" value="{{ supabase_url }}" placeholder="https://your-project-id.supabase.co" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Supabase API Key (Anon or Service Role)</label>
+                    <input id="sb-key-input" type="password" placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="document.getElementById('supabase-modal').classList.add('hidden')" class="px-3.5 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Cancel</button>
+                <button onclick="saveSupabaseSettings()" id="save-sb-btn" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow transition-all">Save & Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimal Footer -->
+    <footer class="border-t border-slate-800/60 bg-slate-950/60 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span class="flex items-center gap-1.5 text-slate-400">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Human-in-the-loop review ensures 100% compliant, ban-free applications.
+            </span>
+            <span>ScholarPilot EU • Master's Scholarships & Student Jobs</span>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-5 right-5 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 z-50 text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 ${
+                type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+            }`;
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check' : 'alert-circle'}" class="w-4 h-4"></i> ${message}`;
+            document.body.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        async function saveSupabaseSettings() {
+            const url = document.getElementById('sb-url-input').value.trim();
+            const key = document.getElementById('sb-key-input').value.trim();
+
+            if (!url || !key) {
+                alert('Please enter both Supabase URL and API Key.');
+                return;
+            }
+
+            const btn = document.getElementById('save-sb-btn');
+            btn.textContent = 'Saving...';
+
+            try {
+                const resp = await fetch('/api/settings/supabase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, key: key })
+                });
+                const data = await resp.json();
+                showToast(data.message);
+                document.getElementById('supabase-modal').classList.add('hidden');
+                setTimeout(() => window.location.reload(), 1000);
+            } catch (err) {
+                alert('Error saving settings: ' + err.message);
+            } finally {
+                btn.textContent = 'Save & Connect';
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

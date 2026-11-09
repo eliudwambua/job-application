@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Applicant Profile & Vault | ScholarPilot EU{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2.5">
+                <i data-lucide="user-check" class="w-6 h-6 text-blue-400"></i>
+                Applicant Master Profile & Document Vault
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                Your master profile is used by AI Copilot to tailor SOPs, CVs, and auto-fill European scholarship & job application portals.
+            </p>
+        </div>
+    </div>
+
+    <!-- PDF Resume Upload Box (Auto-Populate) -->
+    <div class="bg-gradient-to-r from-blue-900/30 to-indigo-900/20 border border-blue-500/30 rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">
+                    <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Smart CV Parser (PDF)
+                </div>
+                <h3 class="text-base font-bold text-white">Auto-Populate Profile from Existing Resume</h3>
+                <p class="text-xs text-slate-300 max-w-xl">
+                    Upload your current CV / Resume (PDF). ScholarPilot will extract your contact info, GPA, graduation year, links, and technical skills automatically.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <input type="file" id="cv-pdf-upload" accept=".pdf" class="hidden" onchange="uploadCvPdf()">
+                <button onclick="document.getElementById('cv-pdf-upload').click()" id="upload-cv-btn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    <span id="upload-cv-label">Upload CV (PDF)</span>
+                </button>
+            </div>
+        </div>
+        <div id="cv-upload-status" class="hidden text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-xl mt-4 flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span id="cv-status-msg">Resume uploaded and parsed successfully! Review the fields below.</span>
+        </div>
+    </div>
+
+    <!-- Master Form -->
+    <form method="POST" action="/api/profile" class="space-y-6">
+        
+        <!-- Section 1: Personal & Contact -->
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="contact" class="w-4 h-4 text-blue-400"></i>
+                1. Personal & Contact Information
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Full Legal Name *</label>
+                    <input type="text" name="full_name" value="{{ profile.full_name or '' }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Email Address *</label>
+                    <input type="email" name="email" value="{{ profile.email or '' }}" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Phone / Mobile (with country code)</label>
+                    <input type="text" name="phone" value="{{ profile.phone or '' }}" placeholder="+49..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Current City & Country</label>
+                    <input type="text" name="location" value="{{ profile.location or '' }}" placeholder="e.g. Berlin, Germany or Delhi, India" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nationality / Citizenship</label>
+                    <input type="text" name="nationality" value="{{ profile.nationality or '' }}" placeholder="e.g. Non-EU or International" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">LinkedIn Profile URL</label>
+                    <input type="url" name="linkedin_url" value="{{ profile.linkedin_url or '' }}" placeholder="https://linkedin.com/in/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">GitHub Profile URL</label>
+                    <input type="url" name="github_url" value="{{ profile.github_url or '' }}" placeholder="https://github.com/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Portfolio / Personal Website</label>
+                    <input type="url" name="portfolio_url" value="{{ profile.portfolio_url or '' }}" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Academic Background & Target Focus -->
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-400"></i>
+                2. Academic Background & Master's Ambition
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Target Degree</label>
+                    <input type="text" name="target_degree" value="{{ profile.target_degree or 'Master of Science (M.Sc.)' }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Target Field / Specialization</label>
+                    <input type="text" name="target_field" value="{{ profile.target_field or '' }}" placeholder="e.g. Computer Science, AI, Sustainable Energy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Target European Countries (JSON / Comma)</label>
+                    <input type="text" name="target_countries" value='{{ profile.target_countries|tojson if profile.target_countries else "[\"Germany\", \"Netherlands\", \"Sweden\", \"UK\"]" }}' class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Bachelor's Degree Title</label>
+                    <input type="text" name="bachelor_degree" value="{{ profile.bachelor_degree or '' }}" placeholder="e.g. B.Sc. in Computer Science" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Undergraduate University</label>
+                    <input type="text" name="bachelor_university" value="{{ profile.bachelor_university or '' }}" placeholder="e.g. University of Technology" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Cumulative GPA</label>
+                    <input type="number" step="0.01" name="gpa" value="{{ profile.gpa or 3.8 }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">GPA Scale</label>
+                    <input type="number" step="0.1" name="gpa_scale" value="{{ profile.gpa_scale or 4.0 }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Graduation Year</label>
+                    <input type="number" name="graduation_year" value="{{ profile.graduation_year or 2025 }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">IELTS Overall Score</label>
+                    <input type="number" step="0.5" name="ielts_score" value="{{ profile.ielts_score or 7.5 }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">TOEFL Score (if taken)</label>
+                    <input type="number" name="toefl_score" value="{{ profile.toefl_score or 105 }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Technical Competencies & Experience -->
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="code" class="w-4 h-4 text-purple-400"></i>
+                3. Technical Competencies & Research Focus
+            </h3>
+
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Core Skills (JSON Array or Comma Separated)</label>
+                <input type="text" name="skills" value='{{ profile.skills|tojson if profile.skills else "[\"Python\", \"Machine Learning\", \"FastAPI\"]" }}' class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                <p class="text-[11px] text-slate-500 mt-1">Keywords used for ATS matching against scholarship requirements and job descriptions.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Research Interests & Thesis Focus</label>
+                <textarea name="research_interests" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">{{ profile.research_interests or '' }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Work / Internship Experience (JSON)</label>
+                    <textarea name="work_experience" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-blue-500">{{ profile.work_experience|tojson(indent=2) if profile.work_experience else '[]' }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Leadership & Volunteer Activities (JSON)</label>
+                    <textarea name="leadership_experience" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-blue-500">{{ profile.leadership_experience|tojson(indent=2) if profile.leadership_experience else '[]' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+            <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4"></i> Save & Update Master Profile
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Check URL for saved query param
+if (new URLSearchParams(window.location.search).get('saved') === 'true') {
+    showToast('Master profile updated successfully!');
+}
+
+async function uploadCvPdf() {
+    const input = document.getElementById('cv-pdf-upload');
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const btnLabel = document.getElementById('upload-cv-label');
+    btnLabel.textContent = 'Parsing PDF...';
+
+    try {
+        const resp = await fetch('/api/profile/upload-cv', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await resp.json();
+
+        if (data.status === 'success') {
+            document.getElementById('cv-upload-status').classList.remove('hidden');
+            document.getElementById('cv-status-msg').textContent = 'Extracted contact details, GPA, and ' + (data.extracted.skills ? data.extracted.skills.length : 0) + ' skills!';
+            showToast('Resume parsed successfully! Reloading...');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            alert('Upload failed: ' + data.message);
+        }
+    } catch (err) {
+        alert('Upload failed: ' + err.message);
+    } finally {
+        btnLabel.textContent = 'Upload CV (PDF)';
+    }
+}
+</script>
+{% endblock %}
+

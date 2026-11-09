@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - {{ profile.full_name }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #111;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            color: #0f172a;
+        }
+        h1 { font-size: 16pt; margin-bottom: 4px; }
+        h2 { font-size: 13pt; margin-top: 16px; margin-bottom: 6px; border-bottom: 1px solid #ccc; padding-bottom: 2px; }
+        h3 { font-size: 11pt; margin-top: 12px; margin-bottom: 4px; }
+        .header {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .header-meta {
+            font-size: 9.5pt;
+            color: #475569;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+        .no-print-bar {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: system-ui, sans-serif;
+            font-size: 12px;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        @media print {
+            .no-print-bar { display: none !important; }
+            body { padding: 0; }
+        }
+        pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print-bar">
+        <span>📄 <b>ScholarPilot Document Preview:</b> Ready to save as official PDF.</span>
+        <div>
+            <button class="btn" onclick="window.print()">🖨️ Print / Save to PDF</button>
+            <button class="btn" style="background:#64748b;" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>{{ profile.full_name }}</h1>
+        <div class="header-meta">
+            {{ profile.email }} | {{ profile.phone }} | {{ profile.location }}
+            {% if profile.linkedin_url %} | LinkedIn: {{ profile.linkedin_url }}{% endif %}
+        </div>
+    </div>
+
+    <pre>{{ content }}</pre>
+
+    <script>
+        // Auto trigger print dialog if requested
+        if (new URLSearchParams(window.location.search).get('autoprint') === 'true') {
+            window.print();
+        }
+    </script>
+</body>
+</html>
+

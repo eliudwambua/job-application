@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Application Pipeline Tracker | ScholarPilot EU{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2.5">
+                <i data-lucide="kanban-square" class="w-6 h-6 text-blue-400"></i>
+                Application Pipeline & Tracker
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                Manage and monitor every European Master's program and student job application from discovery to admission offer.
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 border border-slate-700">
+                Total Tracked: <b class="text-blue-400">{{ total_tracked }}</b>
+            </span>
+            <a href="/opportunities" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Track New
+            </a>
+        </div>
+    </div>
+
+    <!-- Kanban Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 overflow-x-auto pb-6">
+        
+        <!-- Column 1: Bookmarked -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                    <span>📌</span>
+                    <span>Bookmarked</span>
+                </div>
+                <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">{{ columns.bookmarked|length }}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+                {% for app in columns.bookmarked %}
+                {% include "partials/kanban_card.html" %}
+                {% else %}
+                <div class="text-center py-6 text-slate-600 text-xs italic">No bookmarked items</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Column 2: Tailoring Docs -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                    <span>✍️</span>
+                    <span>Tailoring Docs</span>
+                </div>
+                <span class="text-xs font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">{{ columns.tailoring|length }}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+                {% for app in columns.tailoring %}
+                {% include "partials/kanban_card.html" %}
+                {% else %}
+                <div class="text-center py-6 text-slate-600 text-xs italic">No applications in tailoring</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Column 3: Ready to Apply -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-blue-300">
+                    <span>🚀</span>
+                    <span>Ready to Apply</span>
+                </div>
+                <span class="text-xs font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">{{ columns.ready|length }}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+                {% for app in columns.ready %}
+                {% include "partials/kanban_card.html" %}
+                {% else %}
+                <div class="text-center py-6 text-slate-600 text-xs italic">None ready to submit</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Column 4: Applied -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
+                    <span>✅</span>
+                    <span>Submitted</span>
+                </div>
+                <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">{{ columns.applied|length }}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+                {% for app in columns.applied %}
+                {% include "partials/kanban_card.html" %}
+                {% else %}
+                <div class="text-center py-6 text-slate-600 text-xs italic">No submitted apps yet</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Column 5: Interview -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-purple-300">
+                    <span>🎉</span>
+                    <span>Interview</span>
+                </div>
+                <span class="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">{{ columns.interview|length }}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+                {% for app in columns.interview %}
+                {% include "partials/kanban_card.html" %}
+                {% else %}
+                <div class="text-center py-6 text-slate-600 text-xs italic">No interviews yet</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Column 6: Accepted / Awarded -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-300">
+                    <span>🏆</span>
+                    <span>Offer / Awarded</span>
+                </div>
+                <span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">{{ columns.accepted|length }}</span>
+            </div>
+            <div class="space-y-3 flex-1">
+                {% for app in columns.accepted %}
+                {% include "partials/kanban_card.html" %}
+                {% else %}
+                <div class="text-center py-6 text-slate-600 text-xs italic">Awaiting decisions</div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function moveCardStatus(appId, newStatus) {
+    try {
+        const resp = await fetch('/api/applications/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                app_id: appId,
+                status: newStatus
+            })
+        });
+        const data = await resp.json();
+        showToast('Moved to ' + newStatus);
+        setTimeout(() => window.location.reload(), 300);
+    } catch (e) {
+        alert('Failed to update stage: ' + e.message);
+    }
+}
+</script>
+{% endblock %}
+
