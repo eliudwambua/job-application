@@ -1,13 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en" class="dark h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ScholarPilot EU - Automatic Master's & Job Application Copilot{% endblock %}</title>
+    
+    <!-- Instant Theme Detection Script (Prevents FOUC) -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('scholarpilot_theme') || 'dark';
+                if (savedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -17,142 +35,434 @@
                             500: '#3b82f6',
                             600: '#2563eb',
                             700: '#1d4ed8',
+                        },
+                        accent: {
+                            blue: '#0284c7',
+                            lightBlue: '#38bdf8',
+                            green: '#059669',
+                            lightGreen: '#10b981',
                         }
                     }
                 }
             }
         }
     </script>
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.18s ease, border-color 0.18s ease;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        html:not(.dark) ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ============================================================
+           LIGHT THEME (White, Green, Light Blue)
+           ============================================================ */
+        html:not(.dark) body {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html:not(.dark) header {
+            background-color: rgba(255, 255, 255, 0.94) !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.04);
+        }
+
+        html:not(.dark) footer {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #64748b !important;
+        }
+
+        /* Cards & Surfaces in Light Mode */
+        html:not(.dark) .bg-slate-950,
+        html:not(.dark) .bg-slate-900,
+        html:not(.dark) .bg-slate-900\/90,
+        html:not(.dark) .bg-slate-900\/80,
+        html:not(.dark) .bg-slate-900\/70,
+        html:not(.dark) .bg-slate-900\/60,
+        html:not(.dark) .bg-slate-800,
+        html:not(.dark) .bg-slate-800\/80,
+        html:not(.dark) .bg-slate-800\/60 {
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+        }
+
+        /* Subtle panels in Light Mode */
+        html:not(.dark) .bg-slate-950\/80,
+        html:not(.dark) .bg-slate-950\/60,
+        html:not(.dark) .bg-slate-900\/40,
+        html:not(.dark) .bg-slate-800\/40,
+        html:not(.dark) .bg-slate-800\/20 {
+            background-color: #f1f5f9 !important;
+        }
+
+        /* Borders in Light Mode */
+        html:not(.dark) .border-slate-800,
+        html:not(.dark) .border-slate-800\/80,
+        html:not(.dark) .border-slate-800\/60,
+        html:not(.dark) .border-slate-700,
+        html:not(.dark) .border-slate-700\/70,
+        html:not(.dark) .border-slate-700\/60 {
+            border-color: #e2e8f0 !important;
+        }
+
+        /* Typography in Light Mode */
+        html:not(.dark) .text-white {
+            color: #0f172a !important;
+        }
+        html:not(.dark) .text-slate-100,
+        html:not(.dark) .text-slate-200,
+        html:not(.dark) .text-slate-300 {
+            color: #334155 !important;
+        }
+        html:not(.dark) .text-slate-400 {
+            color: #64748b !important;
+        }
+        html:not(.dark) .text-slate-500 {
+            color: #94a3b8 !important;
+        }
+
+        /* Form Inputs & Selects in Light Mode */
+        html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+        html:not(.dark) select,
+        html:not(.dark) textarea {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        html:not(.dark) input:focus,
+        html:not(.dark) select:focus,
+        html:not(.dark) textarea:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+        }
+
+        /* Buttons & Pills in Light Mode */
+        html:not(.dark) .bg-slate-800 {
+            background-color: #f1f5f9 !important;
+            color: #334155 !important;
+            border-color: #cbd5e1 !important;
+        }
+        html:not(.dark) .bg-slate-800:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        html:not(.dark) .hover\:bg-slate-800:hover {
+            background-color: #f1f5f9 !important;
+        }
+        html:not(.dark) .hover\:bg-slate-700:hover {
+            background-color: #e2e8f0 !important;
+        }
+
+        /* Hero Banner in Light Mode (White + Green + Light Blue) */
+        html:not(.dark) .hero-gradient {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0f9ff 100%) !important;
+            border-color: #a7f3d0 !important;
+            box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.08) !important;
+        }
+
+        /* Light Mode Badges & Pills */
+        html:not(.dark) .theme-pill-green {
+            background-color: #ecfdf5 !important;
+            color: #047857 !important;
+            border-color: #a7f3d0 !important;
+        }
+        html:not(.dark) .theme-pill-blue {
+            background-color: #f0f9ff !important;
+            color: #0369a1 !important;
+            border-color: #bae6fd !important;
+        }
+
+        /* ============================================================
+           DARK THEME (Deep Black, Navy Blue, Electric Blue)
+           ============================================================ */
+        html.dark body {
+            background-color: #050811 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark header {
+            background-color: rgba(7, 12, 24, 0.94) !important;
+            border-color: rgba(30, 41, 59, 0.8) !important;
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        html.dark footer {
+            background-color: #040710 !important;
+            border-color: rgba(30, 41, 59, 0.6) !important;
+            color: #64748b !important;
+        }
+
+        html.dark .bg-slate-900,
+        html.dark .bg-slate-900\/90,
+        html.dark .bg-slate-900\/80,
+        html.dark .bg-slate-900\/70,
+        html.dark .bg-slate-900\/60 {
+            background-color: #0c1322 !important;
+        }
+
+        html.dark .bg-slate-950 {
+            background-color: #050811 !important;
+        }
+
+        html.dark .hero-gradient {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(15, 23, 42, 0.85) 50%, #070c18 100%) !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+            box-shadow: 0 4px 25px -2px rgba(37, 99, 235, 0.15) !important;
+        }
     </style>
 </head>
-<body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-blue-600 selection:text-white">
+<body class="h-full flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
     <!-- Top Navigation Bar -->
-    <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="/" class="flex items-center gap-2.5 text-white font-bold text-lg tracking-tight">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
+    <header class="border-b sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            
+            <!-- Left: Logo & Nav Links -->
+            <div class="flex items-center gap-4 lg:gap-6">
+                <!-- Brand Logo -->
+                <a href="/" class="flex items-center gap-2.5 font-bold text-lg tracking-tight group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 text-white group-hover:scale-105 transition-transform">
                         <i data-lucide="graduation-cap" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <span class="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent font-extrabold text-lg sm:text-xl">ScholarPilot</span>
-                        <span class="text-[11px] ml-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">EU</span>
+                        <span class="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent font-extrabold text-lg sm:text-xl">ScholarPilot</span>
+                        <span class="text-[11px] ml-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-bold">EU</span>
                     </div>
                 </a>
 
-                <!-- Main Nav Tabs -->
-                <nav class="hidden md:flex items-center gap-1.5 ml-6">
-                    <a href="/" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'dashboard' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="/" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'dashboard' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
                         <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Dashboard
                     </a>
-                    <a href="/scholarships" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'scholarships' %}bg-purple-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
-                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-purple-400"></i> Scholarships
+                    <a href="/scholarships" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'scholarships' %}bg-purple-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-purple-500 dark:text-purple-400"></i> Scholarships
                     </a>
-                    <a href="/jobs" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'jobs' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
-                        <i data-lucide="briefcase" class="w-3.5 h-3.5 text-emerald-400"></i> Jobs & Internships
+                    <a href="/jobs" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'jobs' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
+                        <i data-lucide="briefcase" class="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"></i> Jobs & Internships
                     </a>
-                    <a href="/applications" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'applications' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                    <a href="/kenya-jobs" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'kenya_jobs' %}bg-red-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
+                        <span class="text-sm leading-none">🇰🇪</span> Kenya Jobs
+                    </a>
+                    <a href="/sources" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'sources' %}bg-sky-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
+                        <i data-lucide="globe" class="w-3.5 h-3.5 text-sky-500 dark:text-sky-400"></i> Sources (60)
+                    </a>
+                    <a href="/applications" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'applications' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
                         <i data-lucide="kanban-square" class="w-3.5 h-3.5"></i> Tracker
                     </a>
-                    <a href="/profile" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all {% if active_tab == 'profile' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} flex items-center gap-1.5">
+                    <a href="/profile" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 {% if active_tab == 'profile' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/80{% endif %}">
                         <i data-lucide="user" class="w-3.5 h-3.5"></i>
                         <span>{{ profile.full_name or 'My Profile' }}</span>
                         {% if profile.gpa %}
-                        <span class="text-[10px] px-1.5 py-0.2 bg-blue-500/20 text-blue-300 rounded font-mono">GPA {{ profile.gpa }}</span>
+                        <span class="text-[10px] px-1.5 py-0.2 bg-blue-500/10 text-blue-600 dark:text-blue-300 rounded font-mono font-bold">GPA {{ profile.gpa }}</span>
                         {% endif %}
                     </a>
                 </nav>
             </div>
 
-            <!-- Database Status & Quick Action -->
-            <div class="flex items-center gap-2.5">
-                <!-- Supabase Status Pill (Click to configure) -->
-                <button onclick="document.getElementById('supabase-modal').classList.remove('hidden')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if supabase_connected %}bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20{% else %}bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-500{% endif %}" title="Click to view or connect Supabase">
-                    <span class="w-2 h-2 rounded-full {% if supabase_connected %}bg-emerald-400 animate-pulse{% else %}bg-amber-400{% endif %}"></span>
-                    <span class="hidden sm:inline">{% if supabase_connected %}Supabase Active{% else %}Supabase Setup{% endif %}</span>
-                    <i data-lucide="settings" class="w-3 h-3 text-slate-400"></i>
+            <!-- Right: Actions & Tools -->
+            <div class="flex items-center gap-2">
+                
+                <!-- Theme Toggle Button (Light / Dark) -->
+                <button id="theme-toggle-btn" onclick="toggleTheme()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all" title="Toggle Light / Dark Mode">
+                    <span id="theme-icon">
+                        <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-400"></i>
+                    </span>
+                    <span id="theme-label" class="hidden sm:inline">Theme</span>
                 </button>
 
-                <a href="/opportunities" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-600/25 transition-all">
+                <!-- Supabase Cloud Sync Status -->
+                <button onclick="document.getElementById('supabase-modal').classList.remove('hidden')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all {% if supabase_connected %}bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/20{% else %}bg-slate-100 dark:bg-slate-800/80 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500{% endif %}" title="Click to view or connect Supabase">
+                    <span class="w-2 h-2 rounded-full {% if supabase_connected %}bg-emerald-500 dark:bg-emerald-400 animate-pulse{% else %}bg-amber-400{% endif %}"></span>
+                    <span class="hidden sm:inline">{% if supabase_connected %}Cloud Synced{% else %}Cloud DB{% endif %}</span>
+                    <i data-lucide="database" class="w-3 h-3 text-slate-400"></i>
+                </button>
+
+                <!-- Quick Apply Button -->
+                <a href="/opportunities" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-sm shadow-blue-600/25 transition-all">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                    <span class="hidden sm:inline">Apply to Master's</span>
-                    <span class="sm:hidden">Apply</span>
+                    <span class="hidden sm:inline">Apply</span>
                 </a>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileNav()" class="md:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" title="Menu">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
             </div>
+        </div>
+
+        <!-- Mobile Nav Menu (Collapsible) -->
+        <div id="mobile-nav" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 px-4 py-3 space-y-1 bg-white dark:bg-slate-900">
+            <a href="/" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'dashboard' %}bg-blue-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">Dashboard</a>
+            <a href="/scholarships" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'scholarships' %}bg-purple-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">Scholarships</a>
+            <a href="/jobs" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'jobs' %}bg-emerald-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">Jobs & Internships</a>
+            <a href="/kenya-jobs" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'kenya_jobs' %}bg-red-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">🇰🇪 Kenya Jobs</a>
+            <a href="/sources" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'sources' %}bg-sky-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">🌐 Job Sources (60)</a>
+            <a href="/applications" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'applications' %}bg-blue-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">Tracker</a>
+            <a href="/profile" class="block px-3 py-2 rounded-lg text-xs font-semibold {% if active_tab == 'profile' %}bg-blue-600 text-white{% else %}text-slate-700 dark:text-slate-300{% endif %}">My Profile</a>
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Supabase Configuration Modal -->
-    <div id="supabase-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+    <div id="supabase-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                         <i data-lucide="database" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-base font-bold text-white">Supabase Cloud Database</h3>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Supabase Cloud Sync</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">PostgreSQL Cloud Storage</p>
+                    </div>
                 </div>
-                <button onclick="document.getElementById('supabase-modal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+                <button onclick="document.getElementById('supabase-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-lg">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Connect your free Supabase project to store your profile, scholarships, and applications in the cloud.
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Connect your Supabase project to store your profile, opportunities, and tailored documents in the cloud. ScholarPilot operates with offline SQLite fallback.
             </p>
 
-            <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700 text-xs space-y-1.5">
-                <div class="font-bold text-emerald-400 flex items-center gap-1">
-                    <i data-lucide="info" class="w-3.5 h-3.5"></i> 1-Step Database Setup:
+            <div class="bg-slate-50 dark:bg-slate-800/80 rounded-xl p-3 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+                <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i> Fast Setup:
                 </div>
-                <div class="text-slate-300">
-                    Open your Supabase project -> <b>SQL Editor</b> -> paste the contents of <code>supabase_schema.sql</code> and click <b>Run</b>.
+                <div class="text-slate-600 dark:text-slate-300">
+                    Run the provided <code>supabase_schema.sql</code> script in your Supabase SQL Editor, then paste your credentials below.
                 </div>
             </div>
 
             <div class="space-y-3 pt-1">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Supabase Project URL</label>
-                    <input id="sb-url-input" type="url" value="{{ supabase_url }}" placeholder="https://your-project-id.supabase.co" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Supabase Project URL</label>
+                    <input id="sb-url-input" type="url" value="{{ supabase_url }}" placeholder="https://your-project.supabase.co" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-mono">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Supabase API Key (Anon or Service Role)</label>
-                    <input id="sb-key-input" type="password" placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Supabase API Key (Anon / Publishable)</label>
+                    <input id="sb-key-input" type="password" placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-mono">
                 </div>
             </div>
 
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="document.getElementById('supabase-modal').classList.add('hidden')" class="px-3.5 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Cancel</button>
+                <button onclick="document.getElementById('supabase-modal').classList.add('hidden')" class="px-3.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
                 <button onclick="saveSupabaseSettings()" id="save-sb-btn" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow transition-all">Save & Connect</button>
             </div>
         </div>
     </div>
 
-    <!-- Minimal Footer -->
-    <footer class="border-t border-slate-800/60 bg-slate-950/60 py-4 text-center text-xs text-slate-500">
+    <!-- Minimal Clean Footer -->
+    <footer class="border-t py-4 text-center text-xs">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-slate-400">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
-                Human-in-the-loop review ensures 100% compliant, ban-free applications.
+            <span class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"></i>
+                Human-in-the-loop review ensures 100% compliant, accurate submissions.
             </span>
-            <span>ScholarPilot EU • Master's Scholarships & Student Jobs</span>
+            <span class="text-slate-400 dark:text-slate-500">ScholarPilot EU • Master's Scholarships, European & Kenya Careers</span>
         </div>
     </footer>
 
+    <!-- Theme & Global Scripts -->
     <script>
+        // Initialize Lucide Icons
         lucide.createIcons();
 
+        // Theme Management
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+            try {
+                localStorage.setItem('scholarpilot_theme', theme);
+            } catch (e) {}
+            updateThemeToggleUI(theme);
+        }
+
+        function updateThemeToggleUI(theme) {
+            const iconContainer = document.getElementById('theme-icon');
+            const label = document.getElementById('theme-label');
+            const btn = document.getElementById('theme-toggle-btn');
+            if (!iconContainer) return;
+
+            if (theme === 'dark') {
+                iconContainer.innerHTML = '<i data-lucide="sun" class="w-3.5 h-3.5 text-amber-400"></i>';
+                if (label) label.textContent = 'Light';
+                if (btn) {
+                    btn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white hover:border-slate-500 transition-all";
+                }
+            } else {
+                iconContainer.innerHTML = '<i data-lucide="moon" class="w-3.5 h-3.5 text-sky-600"></i>';
+                if (label) label.textContent = 'Dark';
+                if (btn) {
+                    btn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:text-slate-900 hover:border-slate-400 shadow-xs transition-all";
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            applyTheme(isDark ? 'light' : 'dark');
+        }
+
+        // Apply on load
+        (function() {
+            const currentTheme = localStorage.getItem('scholarpilot_theme') || 'dark';
+            updateThemeToggleUI(currentTheme);
+        })();
+
+        // Mobile Nav Toggle
+        function toggleMobileNav() {
+            const nav = document.getElementById('mobile-nav');
+            if (nav) nav.classList.toggle('hidden');
+        }
+
+        // Global Toast Notification
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `fixed bottom-5 right-5 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 z-50 text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 ${
@@ -168,6 +478,7 @@
             }, 3500);
         }
 
+        // Supabase Settings Saver
         async function saveSupabaseSettings() {
             const url = document.getElementById('sb-url-input').value.trim();
             const key = document.getElementById('sb-key-input').value.trim();

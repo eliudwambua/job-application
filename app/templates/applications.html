@@ -7,19 +7,19 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-white flex items-center gap-2.5">
-                <i data-lucide="kanban-square" class="w-6 h-6 text-blue-400"></i>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+                <i data-lucide="kanban-square" class="w-6 h-6 text-blue-500"></i>
                 Application Pipeline & Tracker
             </h1>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
                 Manage and monitor every European Master's program and student job application from discovery to admission offer.
             </p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 border border-slate-700">
-                Total Tracked: <b class="text-blue-400">{{ total_tracked }}</b>
+            <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-xs">
+                Total Tracked: <b class="text-blue-600 dark:text-blue-400">{{ total_tracked }}</b>
             </span>
-            <a href="/opportunities" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow">
+            <a href="/opportunities" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Track New
             </a>
         </div>
@@ -29,109 +29,109 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 overflow-x-auto pb-6">
         
         <!-- Column 1: Bookmarked -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+        <div class="bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-300">
                     <span>📌</span>
                     <span>Bookmarked</span>
                 </div>
-                <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">{{ columns.bookmarked|length }}</span>
+                <span class="text-xs font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">{{ columns.bookmarked|length }}</span>
             </div>
             <div class="space-y-3 flex-1">
                 {% for app in columns.bookmarked %}
                 {% include "partials/kanban_card.html" %}
                 {% else %}
-                <div class="text-center py-6 text-slate-600 text-xs italic">No bookmarked items</div>
+                <div class="text-center py-6 text-slate-400 dark:text-slate-600 text-xs italic">No bookmarked items</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Column 2: Tailoring Docs -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+        <div class="bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
                     <span>✍️</span>
                     <span>Tailoring Docs</span>
                 </div>
-                <span class="text-xs font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">{{ columns.tailoring|length }}</span>
+                <span class="text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/20">{{ columns.tailoring|length }}</span>
             </div>
             <div class="space-y-3 flex-1">
                 {% for app in columns.tailoring %}
                 {% include "partials/kanban_card.html" %}
                 {% else %}
-                <div class="text-center py-6 text-slate-600 text-xs italic">No applications in tailoring</div>
+                <div class="text-center py-6 text-slate-400 dark:text-slate-600 text-xs italic">No applications in tailoring</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Column 3: Ready to Apply -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-blue-300">
+        <div class="bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-blue-700 dark:text-blue-300">
                     <span>🚀</span>
                     <span>Ready to Apply</span>
                 </div>
-                <span class="text-xs font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">{{ columns.ready|length }}</span>
+                <span class="text-xs font-bold bg-blue-500/10 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/20">{{ columns.ready|length }}</span>
             </div>
             <div class="space-y-3 flex-1">
                 {% for app in columns.ready %}
                 {% include "partials/kanban_card.html" %}
                 {% else %}
-                <div class="text-center py-6 text-slate-600 text-xs italic">None ready to submit</div>
+                <div class="text-center py-6 text-slate-400 dark:text-slate-600 text-xs italic">None ready to submit</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Column 4: Applied -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
+        <div class="bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-300">
                     <span>✅</span>
                     <span>Submitted</span>
                 </div>
-                <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">{{ columns.applied|length }}</span>
+                <span class="text-xs font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/20">{{ columns.applied|length }}</span>
             </div>
             <div class="space-y-3 flex-1">
                 {% for app in columns.applied %}
                 {% include "partials/kanban_card.html" %}
                 {% else %}
-                <div class="text-center py-6 text-slate-600 text-xs italic">No submitted apps yet</div>
+                <div class="text-center py-6 text-slate-400 dark:text-slate-600 text-xs italic">No submitted apps yet</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Column 5: Interview -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-purple-300">
+        <div class="bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300">
                     <span>🎉</span>
                     <span>Interview</span>
                 </div>
-                <span class="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">{{ columns.interview|length }}</span>
+                <span class="text-xs font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/20">{{ columns.interview|length }}</span>
             </div>
             <div class="space-y-3 flex-1">
                 {% for app in columns.interview %}
                 {% include "partials/kanban_card.html" %}
                 {% else %}
-                <div class="text-center py-6 text-slate-600 text-xs italic">No interviews yet</div>
+                <div class="text-center py-6 text-slate-400 dark:text-slate-600 text-xs italic">No interviews yet</div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Column 6: Accepted / Awarded -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-300">
+        <div class="bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex flex-col min-w-[240px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
                     <span>🏆</span>
                     <span>Offer / Awarded</span>
                 </div>
-                <span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">{{ columns.accepted|length }}</span>
+                <span class="text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/20">{{ columns.accepted|length }}</span>
             </div>
             <div class="space-y-3 flex-1">
                 {% for app in columns.accepted %}
                 {% include "partials/kanban_card.html" %}
                 {% else %}
-                <div class="text-center py-6 text-slate-600 text-xs italic">Awaiting decisions</div>
+                <div class="text-center py-6 text-slate-400 dark:text-slate-600 text-xs italic">Awaiting decisions</div>
                 {% endfor %}
             </div>
         </div>
@@ -161,4 +161,3 @@ async function moveCardStatus(appId, newStatus) {
 }
 </script>
 {% endblock %}
-

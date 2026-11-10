@@ -1,29 +1,29 @@
-<div class="bg-slate-800/80 border border-slate-700/70 hover:border-slate-600 rounded-xl p-3.5 space-y-2.5 transition-all shadow-sm group">
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-slate-600 rounded-xl p-3.5 space-y-2.5 transition-all shadow-xs hover:shadow-sm group">
     <div class="flex items-center justify-between gap-1">
-        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded {% if app.opp_type == 'scholarship' %}bg-purple-500/20 text-purple-300{% elif app.opp_type == 'job' %}bg-emerald-500/20 text-emerald-300{% else %}bg-blue-500/20 text-blue-300{% endif %}">
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded {% if app.opp_type == 'scholarship' %}bg-purple-500/10 text-purple-700 dark:text-purple-300{% elif app.opp_type == 'job' %}bg-emerald-500/10 text-emerald-700 dark:text-emerald-300{% else %}bg-blue-500/10 text-blue-700 dark:text-blue-300{% endif %}">
             {{ app.opp_type }}
         </span>
-        <span class="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-            {{ app.match_score }}% Match
+        <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+            {{ app.match_score }}% Fit
         </span>
     </div>
 
     <div>
-        <h4 class="text-xs font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+        <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
             <a href="/copilot/{{ app.opportunity_id }}">{{ app.opp_title }}</a>
         </h4>
-        <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-            <i data-lucide="building" class="w-3 h-3 text-slate-500"></i>
+        <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1 font-medium">
+            <i data-lucide="building" class="w-3 h-3 text-slate-400"></i>
             <span class="truncate">{{ app.opp_org }}</span>
         </div>
     </div>
 
-    <div class="text-[11px] text-slate-300 flex items-center justify-between pt-1 border-t border-slate-700/60">
+    <div class="text-[11px] text-slate-600 dark:text-slate-300 flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60">
         <span class="flex items-center gap-1">
             <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> {{ app.opp_country }}
         </span>
         {% if app.opp_deadline %}
-        <span class="text-amber-300 font-medium flex items-center gap-1">
+        <span class="text-amber-700 dark:text-amber-300 font-medium flex items-center gap-1">
             <i data-lucide="clock" class="w-3 h-3"></i> {{ app.opp_deadline }}
         </span>
         {% endif %}
@@ -31,7 +31,7 @@
 
     <!-- Quick stage shifter -->
     <div class="pt-2 flex items-center justify-between gap-1.5">
-        <select onchange="moveCardStatus({{ app.id }}, this.value)" class="text-[10px] bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-slate-300 focus:outline-none focus:border-blue-500 w-full">
+        <select onchange="moveCardStatus({{ app.id }}, this.value)" class="text-[10px] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-1.5 py-1 text-slate-800 dark:text-slate-300 focus:outline-none focus:border-blue-500 w-full font-medium">
             <option value="bookmarked" {% if app.status == 'bookmarked' %}selected{% endif %}>📌 Bookmarked</option>
             <option value="tailoring" {% if app.status == 'tailoring' %}selected{% endif %}>✍️ Tailoring</option>
             <option value="ready" {% if app.status == 'ready' %}selected{% endif %}>🚀 Ready</option>
@@ -39,9 +39,8 @@
             <option value="interview" {% if app.status == 'interview' %}selected{% endif %}>🎉 Interview</option>
             <option value="accepted" {% if app.status == 'accepted' %}selected{% endif %}>🏆 Awarded</option>
         </select>
-        <a href="/copilot/{{ app.opportunity_id }}" class="p-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors flex-shrink-0" title="Open Copilot Studio">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-400"></i>
+        <a href="/copilot/{{ app.opportunity_id }}" class="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition-colors flex-shrink-0" title="Open Copilot Studio">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-500"></i>
         </a>
     </div>
 </div>
-

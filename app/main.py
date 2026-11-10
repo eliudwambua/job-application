@@ -10,9 +10,11 @@ from fastapi.templating import Jinja2Templates
 from app.database import init_db, get_db, get_profile_data, update_profile_data, save_supabase_env_credentials
 from app.supabase_client import is_supabase_configured, get_supabase_url
 from app.services.pdf_parser import parse_pdf_resume
+from app.services.document_parser import parse_resume_document
 from app.services.ai_tailor import calculate_match_score, generate_sop, generate_tailored_resume, generate_essay_answers
 from app.services.playwright_copilot import launch_assisted_apply_session, generate_bookmarklet_code
 from app.services.scholarship_scraper import extract_opportunity_from_url
+from app.services.job_scraper import get_flattened_sources, scrape_job_posting, get_job_source_by_id, load_sources_data
 
 app = FastAPI(title="ScholarPilot EU - Master's & Job Application Copilot", version="1.0.0")
 
@@ -214,6 +216,56 @@ async def jobs_page(request: Request, country: Optional[str] = None, q: Optional
             "supabase_connected": is_supabase_configured(),
             "supabase_url": get_supabase_url(),
             "active_tab": "jobs"
+        }
+    )
+
+@app.get("/sources", response_class=HTMLResponse)
+async def sources_page(
+    request: Request,
+    region: Optional[str] = None,
+    country: Optional[str] = None,
+    q: Optional[str] = None
+):
+    profile = get_profile_data()
+    all_sources = get_flattened_sources()
+    
+    # Filter by region
+    filtered = all_sources
+    if region and region != "all":
+        filtered = [s for s in filtered if s.get("region", "").lower() == region.lower()]
+
+    # Filter by country
+    if country and country != "all":
+        filtered = [s for s in filtered if s.get("country", "").lower() == country.lower()]
+
+    # Filter by search
+    if q:
+        query_l = q.lower()
+        filtered = [
+            s for s in filtered 
+            if query_l in s.get("name", "").lower() 
+            or query_l in s.get("country", "").lower()
+            or query_l in s.get("source_type", "").lower()
+        ]
+
+    # Collect distinct countries for dropdown
+    countries = sorted(list(set(s.get("country") for s in all_sources if s.get("country") and s.get("country") not in ["Global", "Europe"])))
+
+    return templates.TemplateResponse(
+        request=request,
+        name="sources.html",
+        context={
+            "profile": profile,
+            "sources": filtered,
+            "total_sources": len(all_sources),
+            "filtered_count": len(filtered),
+            "countries": countries,
+            "current_region": region or "all",
+            "current_country": country or "all",
+            "search_query": q or "",
+            "supabase_connected": is_supabase_configured(),
+            "supabase_url": get_supabase_url(),
+            "active_tab": "sources"
         }
     )
 
@@ -512,35 +564,195 @@ async def save_profile(
     return RedirectResponse(url="/profile?saved=true", status_code=303)
 
 @app.post("/api/profile/upload-cv")
-async def upload_cv_pdf(file: UploadFile = File(...)):
+async def upload_cv_document(file: UploadFile = File(...)):
+    """
+    Parses uploaded PDF and Word documents (.docx, .doc),
+    extracting full contact info, academic history, GPA, skills,
+    work experience, and leadership.
+    """
+    filename = file.filename or ""
     contents = await file.read()
-    extracted = parse_pdf_resume(contents)
+    
+    extracted = parse_resume_document(contents, filename)
+    if not extracted or not extracted.get("raw_text"):
+        return JSONResponse({
+            "status": "error",
+            "message": "Could not extract text from document. Ensure it is a valid PDF or Word (.docx/.doc) file."
+        }, status_code=400)
 
     profile = get_profile_data()
+
+    # Full Name
+    if extracted.get("full_name"):
+        profile["full_name"] = extracted["full_name"]
+
+    # Contact & Links
     if extracted.get("email"):
         profile["email"] = extracted["email"]
     if extracted.get("phone"):
         profile["phone"] = extracted["phone"]
+    if extracted.get("location"):
+        profile["location"] = extracted["location"]
+    if extracted.get("nationality"):
+        profile["nationality"] = extracted["nationality"]
     if extracted.get("linkedin_url"):
         profile["linkedin_url"] = extracted["linkedin_url"]
     if extracted.get("github_url"):
         profile["github_url"] = extracted["github_url"]
-    if extracted.get("gpa"):
+    if extracted.get("portfolio_url"):
+        profile["portfolio_url"] = extracted["portfolio_url"]
+
+    # Academic & Credentials
+    if extracted.get("bachelor_degree"):
+        profile["bachelor_degree"] = extracted["bachelor_degree"]
+    if extracted.get("bachelor_university"):
+        profile["bachelor_university"] = extracted["bachelor_university"]
+    if extracted.get("gpa") is not None:
         profile["gpa"] = extracted["gpa"]
+    if extracted.get("gpa_scale") is not None:
+        profile["gpa_scale"] = extracted["gpa_scale"]
     if extracted.get("graduation_year"):
         profile["graduation_year"] = extracted["graduation_year"]
+    if extracted.get("ielts_score"):
+        profile["ielts_score"] = extracted["ielts_score"]
+    if extracted.get("toefl_score"):
+        profile["toefl_score"] = extracted["toefl_score"]
+    if extracted.get("gre_score"):
+        profile["gre_score"] = extracted["gre_score"]
+
+    # Target field & research focus
+    if extracted.get("target_field"):
+        profile["target_field"] = extracted["target_field"]
+    if extracted.get("research_interests"):
+        profile["research_interests"] = extracted["research_interests"]
+
+    # Skills merge (unique preservation)
     if extracted.get("skills"):
         existing_skills = profile.get("skills", [])
-        if isinstance(existing_skills, list):
-            combined = list(set(existing_skills + extracted["skills"]))
-            profile["skills"] = combined
+        if not isinstance(existing_skills, list):
+            existing_skills = []
+        combined_skills = list(dict.fromkeys(existing_skills + extracted["skills"]))
+        profile["skills"] = combined_skills
 
+    # Work & Leadership Experience
+    if extracted.get("work_experience") and len(extracted["work_experience"]) > 0:
+        profile["work_experience"] = extracted["work_experience"]
+    if extracted.get("leadership_experience") and len(extracted["leadership_experience"]) > 0:
+        profile["leadership_experience"] = extracted["leadership_experience"]
+
+    # Save to SQLite and Supabase
     update_profile_data(profile)
+
+    captured_summary = {
+        "full_name": profile.get("full_name"),
+        "email": profile.get("email"),
+        "phone": profile.get("phone"),
+        "location": profile.get("location"),
+        "bachelor_degree": profile.get("bachelor_degree"),
+        "bachelor_university": profile.get("bachelor_university"),
+        "gpa": profile.get("gpa"),
+        "skills_count": len(profile.get("skills", [])),
+        "experience_count": len(profile.get("work_experience", [])),
+    }
 
     return JSONResponse({
         "status": "success",
-        "message": "Resume uploaded and parsed successfully!",
-        "extracted": extracted
+        "message": f"Successfully parsed {filename}! Extracted {captured_summary['skills_count']} skills, GPA {captured_summary['gpa']}, and education details.",
+        "extracted": extracted,
+        "summary": captured_summary
+    })
+
+
+@app.get("/api/scraper/sources")
+async def get_sources_endpoint():
+    """Returns the complete 60 sources directory as JSON."""
+    return JSONResponse(load_sources_data())
+
+
+@app.post("/api/scraper/scrape-url")
+async def scrape_url_endpoint(payload: dict):
+    """
+    Scrapes a job posting from any URL (including our 60 directory platforms)
+    and returns parsed structured opportunity fields.
+    """
+    url = (payload.get("url") or "").strip()
+    source_id = payload.get("source_id")
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required for web scraping.")
+
+    scraped = await scrape_job_posting(url, custom_source_id=source_id)
+    return JSONResponse(scraped)
+
+
+@app.post("/api/scraper/import-job")
+async def import_scraped_job(payload: dict):
+    """
+    Imports a scraped job opportunity directly into the ScholarPilot catalog.
+    """
+    title = (payload.get("title") or "Imported Opportunity").strip()
+    organization = (payload.get("organization") or "Host Organization").strip()
+    opp_type = payload.get("type", "job")
+    country = payload.get("country", "Europe")
+    city = payload.get("city", "")
+    deadline = payload.get("deadline", "")
+    funding_type = payload.get("funding_type", "paid")
+    stipend_amount = payload.get("stipend_amount", "")
+    degree_level = payload.get("degree_level", "Bachelor / Master")
+    requirements = payload.get("requirements", [])
+    if isinstance(requirements, list):
+        req_json = json.dumps(requirements)
+    else:
+        req_json = str(requirements)
+    description = payload.get("description", "")
+    url = payload.get("url", "")
+    source = payload.get("source", "Web Scraper")
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO opportunities (
+        title, organization, type, country, city, deadline,
+        funding_type, stipend_amount, degree_level, requirements,
+        description, url, source
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        title, organization, opp_type, country, city, deadline,
+        funding_type, stipend_amount, degree_level, req_json,
+        description, url, source
+    ))
+    conn.commit()
+    opp_id = cursor.lastrowid
+    conn.close()
+
+    # Also sync with Supabase if active
+    from app.supabase_client import get_supabase
+    sb = get_supabase()
+    if sb:
+        try:
+            sb.table("opportunities").upsert({
+                "id": opp_id,
+                "title": title,
+                "organization": organization,
+                "type": opp_type,
+                "country": country,
+                "city": city,
+                "deadline": deadline,
+                "funding_type": funding_type,
+                "stipend_amount": stipend_amount,
+                "degree_level": degree_level,
+                "requirements": requirements if isinstance(requirements, list) else [],
+                "description": description,
+                "url": url,
+                "source": source
+            }).execute()
+        except Exception as e:
+            print(f"[Supabase Sync Import Notice]: {e}")
+
+    return JSONResponse({
+        "status": "success",
+        "opp_id": opp_id,
+        "message": f"Successfully scraped and imported '{title}' into catalog!",
+        "copilot_url": f"/copilot/{opp_id}"
     })
 
 @app.post("/api/settings/supabase")
@@ -610,22 +822,106 @@ async def launch_browser_copilot(payload: dict):
     if not target_url or not target_url.startswith("http"):
         target_url = "https://www.google.com"
 
-    runner_script = os.path.join(os.path.dirname(__file__), "services", "browser_runner.py")
-    profile_json = json.dumps(profile)
-
+    # Always use system default browser — most reliable on Windows
     try:
-        # Spawn detached process that pops up on Windows desktop
-        subprocess.Popen(
-            [sys.executable, runner_script, target_url, profile_json, tailored_doc],
-            creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0
-        )
-    except Exception as e:
-        # Reliable fallback: open portal in default browser
         webbrowser.open(target_url)
+    except Exception:
+        pass
 
     return JSONResponse({
         "status": "launched",
-        "message": "Browser Copilot launched! Check your Windows taskbar for the window."
+        "message": f"Opening {target_url} in your default browser..."
+    })
+
+
+@app.post("/api/copilot/auto-apply")
+async def auto_apply_job(payload: dict):
+    """
+    Auto-apply endpoint: generates docs + opens the application URL.
+    The user clicks 'Confirm & Auto-Apply' — we prepare everything and
+    open the job portal. User does the final submit (no CAPTCHA bypassing).
+    """
+    import subprocess
+    import sys
+    import webbrowser
+
+    opp_id = payload.get("opp_id")
+    if not opp_id:
+        raise HTTPException(status_code=400, detail="opp_id is required")
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM opportunities WHERE id = ?", (opp_id,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+
+    opp = dict(row)
+    try:
+        opp["requirements"] = json.loads(opp["requirements"])
+    except Exception:
+        opp["requirements"] = []
+
+    profile = get_profile_data()
+
+    # Create / find application record
+    cursor.execute("SELECT id FROM applications WHERE opportunity_id = ?", (opp_id,))
+    existing_app = cursor.fetchone()
+
+    if existing_app:
+        app_id = existing_app[0]
+        cursor.execute(
+            "UPDATE applications SET status = 'tailoring', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (app_id,)
+        )
+    else:
+        match = calculate_match_score(profile, opp)
+        cursor.execute(
+            "INSERT INTO applications (opportunity_id, status, match_score) VALUES (?, 'tailoring', ?)",
+            (opp_id, match["score"])
+        )
+        app_id = cursor.lastrowid
+
+    conn.commit()
+
+    # Generate SOP if not already cached
+    cursor.execute(
+        "SELECT id, content FROM tailored_docs WHERE application_id = ? AND doc_type = 'sop'",
+        (app_id,)
+    )
+    sop_row = cursor.fetchone()
+
+    if not sop_row:
+        sop_content = generate_sop(profile, opp)
+        cursor.execute(
+            "INSERT INTO tailored_docs (application_id, doc_type, title, content) VALUES (?, 'sop', ?, ?)",
+            (app_id, f"SOP - {opp['title']}", sop_content)
+        )
+        conn.commit()
+
+    # Mark as applied
+    cursor.execute(
+        "UPDATE applications SET status = 'applied', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (app_id,)
+    )
+    conn.commit()
+    conn.close()
+
+    # Open the job portal in the user's default browser
+    target_url = opp.get("url", "").strip()
+    if target_url and target_url.startswith("http"):
+        try:
+            webbrowser.open(target_url)
+        except Exception:
+            pass
+
+    return JSONResponse({
+        "status": "success",
+        "app_id": app_id,
+        "message": f"✅ Application prepared! Opening {opp['organization']} portal in your browser. Your SOP and CV are ready in Copilot Studio.",
+        "copilot_url": f"/copilot/{opp_id}",
+        "target_url": target_url
     })
 
 @app.post("/api/applications/update-status")

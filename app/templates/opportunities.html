@@ -7,29 +7,29 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-white flex items-center gap-2.5">
-                <i data-lucide="compass" class="w-6 h-6 text-blue-400"></i>
-                European Scholarships & Student Jobs Catalog
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+                <i data-lucide="compass" class="w-6 h-6 text-blue-500"></i>
+                Scholarships & Careers Catalog
             </h1>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">
-                Curated funding, Erasmus Mundus consortia, DAAD programs, and paid student employment in Europe.
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Curated funding, Erasmus Mundus consortia, DAAD programs, paid European student jobs, and Kenyan roles.
             </p>
         </div>
-        <button onclick="document.getElementById('add-opp-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/30 transition-all self-start sm:self-auto">
+        <button onclick="document.getElementById('add-opp-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md shadow-blue-600/25 transition-all self-start sm:self-auto">
             <i data-lucide="plus-circle" class="w-4 h-4"></i> Add New Opportunity / URL
         </button>
     </div>
 
     <!-- Filters & Search Bar -->
-    <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-4 space-y-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
         <form method="GET" action="/opportunities" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <div class="sm:col-span-5 relative">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
-                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, university, field, or keywords..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, university, field, or keywords..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
             </div>
 
             <div class="sm:col-span-3">
-                <select name="type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
+                <select name="type" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                     <option value="all" {% if current_type == 'all' %}selected{% endif %}>All Types (Scholarship + Jobs)</option>
                     <option value="scholarship" {% if current_type == 'scholarship' %}selected{% endif %}>🎓 Master's Scholarships</option>
                     <option value="job" {% if current_type == 'job' %}selected{% endif %}>💼 Working Student (Werkstudent)</option>
@@ -38,7 +38,7 @@
             </div>
 
             <div class="sm:col-span-2">
-                <select name="country" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500">
+                <select name="country" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                     <option value="all" {% if current_country == 'all' %}selected{% endif %}>All Countries</option>
                     {% for c in countries %}
                     <option value="{{ c }}" {% if current_country == c %}selected{% endif %}>{{ c }}</option>
@@ -47,10 +47,10 @@
             </div>
 
             <div class="sm:col-span-2 flex gap-2">
-                <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white rounded-xl py-2 px-3 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl py-2 px-3 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs">
                     <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filter
                 </button>
-                <a href="/opportunities" class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl p-2 flex items-center justify-center transition-colors" title="Reset Filters">
+                <a href="/opportunities" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl p-2 flex items-center justify-center transition-colors border border-slate-200 dark:border-slate-700" title="Reset Filters">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -60,63 +60,63 @@
     <!-- Opportunities Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         {% for opp in opportunities %}
-        <div class="bg-slate-800/50 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between transition-all group shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all group shadow-xs hover:shadow-md">
             <div class="space-y-3">
                 <!-- Badges Row -->
                 <div class="flex items-center justify-between gap-2 flex-wrap">
                     <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider {% if opp.type == 'scholarship' %}bg-purple-500/10 text-purple-400 border border-purple-500/25{% elif opp.type == 'job' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/25{% else %}bg-blue-500/10 text-blue-400 border border-blue-500/25{% endif %}">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider {% if opp.type == 'scholarship' %}bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20{% elif opp.type == 'job' %}bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20{% else %}bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20{% endif %}">
                             {{ opp.type }}
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-700/60 text-slate-300 flex items-center gap-1">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1">
                             <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> {{ opp.country }}
                         </span>
                         {% if opp.deadline %}
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/25 flex items-center gap-1">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex items-center gap-1">
                             <i data-lucide="calendar" class="w-3 h-3"></i> {{ opp.deadline }}
                         </span>
                         {% endif %}
                     </div>
 
                     <!-- Match Score Pill -->
-                    <div class="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold {% if opp.match_score >= 85 %}bg-emerald-500/15 text-emerald-300 border border-emerald-500/30{% elif opp.match_score >= 70 %}bg-blue-500/15 text-blue-300 border border-blue-500/30{% else %}bg-amber-500/15 text-amber-300 border border-amber-500/30{% endif %}" title="Relevance calculated against your GPA and field">
+                    <div class="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold {% if opp.match_score >= 85 %}bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20{% elif opp.match_score >= 70 %}bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20{% else %}bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20{% endif %}" title="Relevance calculated against your GPA and field">
                         <i data-lucide="zap" class="w-3.5 h-3.5"></i> {{ opp.match_score }}% Match
                     </div>
                 </div>
 
                 <!-- Title & Organization -->
                 <div>
-                    <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
                         <a href="/copilot/{{ opp.id }}">{{ opp.title }}</a>
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
-                        <i data-lucide="landmark" class="w-3.5 h-3.5 text-slate-500"></i> {{ opp.organization }}
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
+                        <i data-lucide="landmark" class="w-3.5 h-3.5 text-slate-400"></i> {{ opp.organization }}
                     </p>
                 </div>
 
                 <!-- Description -->
-                <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
                     {{ opp.description }}
                 </p>
 
                 <!-- Financial Benefit Highlight -->
                 {% if opp.stipend_amount %}
-                <div class="text-xs bg-slate-900/80 rounded-xl p-3 text-blue-300 border border-slate-700/60 flex items-start gap-2.5">
-                    <i data-lucide="coins" class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0"></i>
+                <div class="text-xs bg-slate-50 dark:bg-slate-950/80 rounded-xl p-3 text-slate-800 dark:text-blue-300 border border-slate-200 dark:border-slate-800 flex items-start gap-2.5">
+                    <i data-lucide="coins" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0"></i>
                     <div>
-                        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Funding & Benefits</div>
-                        <div class="font-semibold text-slate-100 text-xs mt-0.5">{{ opp.stipend_amount }}</div>
+                        <div class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Funding & Benefits</div>
+                        <div class="font-semibold text-slate-900 dark:text-white text-xs mt-0.5">{{ opp.stipend_amount }}</div>
                     </div>
                 </div>
                 {% endif %}
 
                 <!-- Requirements tags -->
                 {% if opp.requirements %}
-                <div class="space-y-1 pt-1">
-                    <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Key Requirements</div>
+                <div class="space-y-1.5 pt-1">
+                    <div class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Key Requirements</div>
                     <div class="flex flex-wrap gap-1.5">
                         {% for req in opp.requirements[:4] %}
-                        <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700/60">
+                        <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700/60 font-medium">
                             {{ req }}
                         </span>
                         {% endfor %}
@@ -126,8 +126,8 @@
             </div>
 
             <!-- Bottom Action Row -->
-            <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between gap-3">
-                <a href="{{ opp.url }}" target="_blank" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 font-medium transition-colors">
+            <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                <a href="{{ opp.url }}" target="_blank" class="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 font-medium transition-colors">
                     <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Visit Portal
                 </a>
                 <a href="/copilot/{{ opp.id }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-all">
@@ -136,10 +136,10 @@
             </div>
         </div>
         {% else %}
-        <div class="col-span-2 text-center py-16 bg-slate-800/20 border border-dashed border-slate-800 rounded-2xl">
-            <i data-lucide="search-x" class="w-10 h-10 mx-auto text-slate-500 mb-3"></i>
-            <h3 class="text-base font-semibold text-white">No opportunities matched your filters</h3>
-            <p class="text-xs text-slate-400 mt-1">Try clearing some filter criteria or add a custom opportunity URL.</p>
+        <div class="col-span-2 text-center py-16 bg-white dark:bg-slate-900/40 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl">
+            <i data-lucide="search-x" class="w-10 h-10 mx-auto text-slate-400 mb-3"></i>
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">No opportunities matched your filters</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Try clearing some filter criteria or add a custom opportunity URL.</p>
             <button onclick="document.getElementById('add-opp-modal').classList.remove('hidden')" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold">
                 <i data-lucide="plus" class="w-4 h-4"></i> Add Custom Opportunity
             </button>
@@ -149,25 +149,25 @@
 </div>
 
 <!-- Modal: Add New Opportunity -->
-<div id="add-opp-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl my-8">
+<div id="add-opp-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl my-8">
         <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                <i data-lucide="plus-circle" class="w-5 h-5 text-blue-400"></i>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-5 h-5 text-blue-500"></i>
                 Add Scholarship or Job Opportunity
             </h3>
-            <button onclick="document.getElementById('add-opp-modal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+            <button onclick="document.getElementById('add-opp-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-lg">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
 
         <!-- URL Auto-Extractor Box -->
-        <div class="bg-blue-950/40 border border-blue-500/30 rounded-xl p-3.5 space-y-2">
-            <div class="text-xs font-bold text-blue-300 flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-400"></i> Quick Auto-Fill from Web Link:
+        <div class="hero-gradient border rounded-xl p-3.5 space-y-2">
+            <div class="text-xs font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-500"></i> Quick Auto-Fill from Web Link:
             </div>
             <div class="flex gap-2">
-                <input id="modal-url-input" type="url" placeholder="Paste scholarship or job URL here..." class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                <input id="modal-url-input" type="url" placeholder="Paste scholarship or job URL here..." class="flex-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                 <button type="button" onclick="autoFillFromUrl()" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1">
                     <span id="autofill-btn-text">Auto-Fill</span>
                 </button>
@@ -176,18 +176,18 @@
 
         <form method="POST" action="/api/opportunities" class="space-y-3.5">
             <div>
-                <label class="block text-xs font-medium text-slate-300 mb-1">Opportunity Title *</label>
-                <input id="f-title" type="text" name="title" required placeholder="e.g. Erasmus Mundus in Data Science or Werkstudent AI" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Opportunity Title *</label>
+                <input id="f-title" type="text" name="title" required placeholder="e.g. Erasmus Mundus in Data Science or Werkstudent AI" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Institution / Organization *</label>
-                    <input id="f-org" type="text" name="organization" required placeholder="e.g. TU Munich, DAAD, Siemens" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Institution / Organization *</label>
+                    <input id="f-org" type="text" name="organization" required placeholder="e.g. TU Munich, DAAD, Siemens" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Category *</label>
-                    <select id="f-type" name="type" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Category *</label>
+                    <select id="f-type" name="type" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                         <option value="scholarship">Master's Scholarship</option>
                         <option value="job">Student Job / Werkstudent</option>
                         <option value="internship">Graduate Internship</option>
@@ -197,42 +197,42 @@
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Country *</label>
-                    <input id="f-country" type="text" name="country" required placeholder="e.g. Germany, Netherlands" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Country *</label>
+                    <input id="f-country" type="text" name="country" required placeholder="e.g. Germany, Netherlands, Kenya" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Application Deadline</label>
-                    <input id="f-deadline" type="text" name="deadline" placeholder="e.g. 2026-03-31 or 15 Jan 2026" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Application Deadline</label>
+                    <input id="f-deadline" type="text" name="deadline" placeholder="e.g. 2026-03-31 or 15 Jan 2026" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Funding Type</label>
-                    <select id="f-funding" name="funding_type" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Funding Type</label>
+                    <select id="f-funding" name="funding_type" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                         <option value="fully_funded">Fully Funded (Tuition + Monthly Stipend)</option>
                         <option value="partial">Partial Funding / Fee Waiver</option>
                         <option value="paid">Paid Salary (Hourly / Monthly)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Stipend / Wage Details</label>
-                    <input id="f-stipend" type="text" name="stipend_amount" placeholder="e.g. €1,400/month or €20/hour" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Stipend / Wage Details</label>
+                    <input id="f-stipend" type="text" name="stipend_amount" placeholder="e.g. €1,400/month or €20/hour" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-slate-300 mb-1">Application Portal Link</label>
-                <input id="f-url" type="url" name="url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Application Portal Link</label>
+                <input id="f-url" type="url" name="url" placeholder="https://..." class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500">
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-slate-300 mb-1">Program / Role Description</label>
-                <textarea id="f-desc" name="description" rows="3" placeholder="Paste overview or key requirements..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Program / Role Description</label>
+                <textarea id="f-desc" name="description" rows="3" placeholder="Paste overview or key requirements..." class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"></textarea>
             </div>
 
             <div class="flex justify-end gap-2 pt-2">
-                <button type="button" onclick="document.getElementById('add-opp-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Cancel</button>
+                <button type="button" onclick="document.getElementById('add-opp-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
                 <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow">Save & Open Copilot</button>
             </div>
         </form>
@@ -278,4 +278,3 @@ async function autoFillFromUrl() {
 }
 </script>
 {% endblock %}
-
